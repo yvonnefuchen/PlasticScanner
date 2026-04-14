@@ -1,0 +1,36 @@
+.selector {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 1000;
+  display: flex;
+  gap: 6px;
+  background: rgba(11, 15, 30, 0.7);
+  backdrop-filter: blur(8px);
+  border: 1px solid rgba(110, 231, 247, 0.2);
+  border-radius: 99px;
+  padding: 6px 10px;
+}
+
+.btn {
+  background: transparent;
+  border: none;
+  color: rgba(240, 244, 255, 0.5);
+  font-size: 0.8rem;
+  font-weight: 600;
+  padding: 4px 10px;
+  border-radius: 99px;
+  cursor: pointer;
+  transition: background 0.2s, color 0.2s;
+  font-family: inherit;
+}
+
+.btn:hover {
+  color: #f0f4ff;
+  background: rgba(110, 231, 247, 0.1);
+}
+
+.active {
+  background: #6ee7f7;
+  color: #0b0f1e;
+}
