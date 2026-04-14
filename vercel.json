@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run build",
+  "outputDirectory": "plasticraft/dist",
+  "installCommand": "cd plasticraft && npm ci",
+  "framework": "vite"
+}
