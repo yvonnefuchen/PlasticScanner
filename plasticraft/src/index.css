@@ -452,3 +452,262 @@ html, body {
   background: var(--primary);
   transform: scale(1.3);
 }
+
+/* ── Making diagram ── */
+.making-diagram {
+  width: 100%;
+  max-width: 360px;
+  height: auto;
+  margin: 4px auto;
+  display: block;
+  opacity: 0.92;
+}
+
+/* ── Survey phases ── */
+.phase-survey {
+  justify-content: flex-start;
+  padding-top: 20px;
+  overflow-y: auto;
+}
+
+.survey-title {
+  font-size: 1.35rem;
+  font-weight: 800;
+  color: var(--primary);
+  margin: 0 0 4px;
+}
+
+.survey-section-head {
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  margin: 8px 0 0;
+  align-self: flex-start;
+  max-width: 560px;
+  width: 100%;
+}
+
+.survey-q-block {
+  background: var(--surface);
+  border: 1.5px solid var(--surface2);
+  border-radius: 16px;
+  padding: 16px 20px;
+  width: 100%;
+  max-width: 560px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.survey-q-label {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0;
+  line-height: 1.5;
+}
+
+/* Yes/No buttons */
+.yn-btns {
+  display: flex;
+  gap: 10px;
+}
+
+.yn-btn {
+  flex: 1;
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 12px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  font-family: var(--font);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+}
+.yn-btn:hover { border-color: var(--primary); transform: scale(1.03); }
+.yn-btn--selected {
+  border-color: var(--primary);
+  background: var(--primary-dim);
+  color: var(--primary);
+}
+
+/* Choice grid (3–4 options) */
+.choice-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.choice-btn {
+  flex: 1 1 80px;
+  background: var(--surface2);
+  border: 2px solid transparent;
+  border-radius: 12px;
+  padding: 12px 8px;
+  font-size: 1rem;
+  font-weight: 700;
+  font-family: var(--font);
+  color: var(--text);
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s, transform 0.1s;
+  min-width: 64px;
+}
+.choice-btn:hover { border-color: var(--primary); transform: scale(1.04); }
+.choice-btn--selected {
+  border-color: var(--primary);
+  background: var(--primary-dim);
+  color: var(--primary);
+}
+
+/* Star rating */
+.star-rating {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.star-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: var(--surface2);
+  line-height: 1;
+  padding: 0 2px;
+  transition: color 0.12s, transform 0.1s;
+}
+.star-btn:hover { transform: scale(1.18); }
+.star-btn--on { color: #FFD54F; }
+
+.star-labels-row {
+  display: flex;
+  width: 100%;
+}
+
+.star-label {
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+/* Survey thank-you screen */
+.survey-thanks {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 20px;
+  padding: 40px 20px;
+}
+.survey-thanks__text {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: var(--success);
+  text-align: center;
+  margin: 0;
+}
+
+/* ── Admin page ── */
+.admin-page {
+  min-height: 100dvh;
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font);
+  padding: 28px 24px 60px;
+  overflow-y: auto;
+}
+
+.admin-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+.admin-header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--primary);
+}
+
+.admin-csv-btn {
+  background: var(--surface);
+  border: 1.5px solid var(--primary);
+  color: var(--primary);
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  font-family: var(--font);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.admin-csv-btn:hover { background: var(--primary-dim); }
+
+.admin-stats {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 28px;
+}
+
+.admin-stat {
+  background: var(--surface);
+  border: 1.5px solid var(--surface2);
+  border-radius: 12px;
+  padding: 14px 18px;
+  min-width: 130px;
+  text-align: center;
+}
+.admin-stat__value {
+  font-size: 1.4rem;
+  font-weight: 800;
+  color: var(--primary);
+}
+.admin-stat__label {
+  font-size: 0.75rem;
+  color: var(--text-dim);
+  margin-top: 4px;
+}
+
+.admin-empty {
+  color: var(--text-dim);
+  font-size: 1.1rem;
+  text-align: center;
+  padding: 40px;
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border-radius: 12px;
+  border: 1.5px solid var(--surface2);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.82rem;
+}
+.admin-table th {
+  background: var(--surface);
+  color: var(--text-dim);
+  font-weight: 600;
+  padding: 10px 12px;
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: 1.5px solid var(--surface2);
+}
+.admin-table td {
+  padding: 9px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  white-space: nowrap;
+  color: var(--text);
+}
+.admin-table tbody tr:hover td { background: var(--surface); }
+
+td.cell-correct { color: #6ef7a0; }
+td.cell-wrong   { color: #ff8a65; }
+td.cell-empty   { color: rgba(240,244,255,0.25); }

@@ -11,12 +11,15 @@ import { PhaseQuiz } from './phases/PhaseQuiz';
 import { PhaseCorrect } from './phases/PhaseCorrect';
 import { PhaseToken } from './phases/PhaseToken';
 import { PhaseMaking } from './phases/PhaseMaking';
+import { PhaseSurveyPre } from './phases/PhaseSurveyPre';
+import { PhaseSurveyPost } from './phases/PhaseSurveyPost';
 
 import { PLASTICS, DEMO_PLASTIC, type PlasticId } from './data/plastics';
 import { identifyPlastic } from './services/scanner';
 
 type AppPhase =
   | 'idle'
+  | 'survey-pre'
   | 'scanning'
   | 'countdown'
   | 'analyzing'
@@ -24,11 +27,13 @@ type AppPhase =
   | 'quiz'
   | 'correct'
   | 'phase2'
-  | 'phase3';
+  | 'phase3'
+  | 'survey-post';
 
 function AppInner() {
   const { lang } = useLang();
   const [phase, setPhase] = useState<AppPhase>('idle');
+  const [sessionId, setSessionId] = useState<string | null>(null);
   const [identifiedId, setIdentifiedId] = useState<PlasticId>(DEMO_PLASTIC);
   const [countdown, setCountdown] = useState<number | null>(null);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -92,7 +97,13 @@ function AppInner() {
       <AnimatePresence mode="wait">
         {phase === 'idle' && (
           <PageWrap key="idle">
-            <PhaseIdle onStart={() => setPhase('scanning')} />
+            <PhaseIdle onStart={() => setPhase('survey-pre')} />
+          </PageWrap>
+        )}
+
+        {phase === 'survey-pre' && (
+          <PageWrap key="survey-pre">
+            <PhaseSurveyPre onComplete={(id) => { setSessionId(id); setPhase('scanning'); }} />
           </PageWrap>
         )}
 
@@ -151,7 +162,13 @@ function AppInner() {
 
         {phase === 'phase3' && (
           <PageWrap key="phase3">
-            <PhaseMaking onDone={reset} />
+            <PhaseMaking onDone={() => setPhase('survey-post')} />
+          </PageWrap>
+        )}
+
+        {phase === 'survey-post' && (
+          <PageWrap key="survey-post">
+            <PhaseSurveyPost sessionId={sessionId ?? ''} onDone={reset} />
           </PageWrap>
         )}
       </AnimatePresence>
