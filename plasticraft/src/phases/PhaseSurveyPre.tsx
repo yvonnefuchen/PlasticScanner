@@ -49,6 +49,8 @@ const Q4: Tri = {
 };
 const YES: Tri = { zh: '聽過', ja: 'はい', en: 'Yes' };
 const NO: Tri = { zh: '沒有', ja: 'いいえ', en: 'No' };
+const YES2: Tri = { zh: '是', ja: 'はい', en: 'Yes' };
+const NO2: Tri = { zh: '不是', ja: 'いいえ', en: 'No' };
 const NOT_SURE: Tri = { zh: '不確定', ja: 'わからない', en: 'Not sure' };
 const LOW4: Tri = { zh: '不喜歡', ja: 'あまり…', en: 'Not much' };
 const HIGH4: Tri = { zh: '超喜歡！', ja: '大好き！', en: 'Love it!' };
@@ -138,7 +140,7 @@ export function PhaseSurveyPre({ onComplete }: Props) {
                     className={`yn-btn ${answers.q2 === v ? 'yn-btn--selected' : ''}`}
                     onClick={() => set('q2', v)}
                   >
-                    {v === 'yes' ? <T s={YES} /> : <T s={NO} />}
+                    {v === 'yes' ? <T s={YES2} /> : <T s={NO2} />}
                   </button>
                 ))}
               </div>

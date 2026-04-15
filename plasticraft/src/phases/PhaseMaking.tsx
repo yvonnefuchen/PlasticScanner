@@ -1,73 +1,102 @@
-import { useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { T } from '../components/T';
 import type { Tri } from '../data/plastics';
+import { savePhoto } from '../services/survey';
 
 interface Props {
   onDone: () => void;
+  onBack?: () => void;
+  sessionId?: string;
+}
+
+/* ── Shared: Hexagonal Connector ─────────────────────────────────────────── */
+function HexPoly({ cx, cy, r, fill = '#FF8A65', stroke = '#E64A19' }: {
+  cx: number; cy: number; r: number; fill?: string; stroke?: string;
+}) {
+  const pts = Array.from({ length: 6 }, (_, i) => {
+    const a = (i * 60 - 30) * Math.PI / 180;
+    return `${cx + r * Math.cos(a)},${cy + r * Math.sin(a)}`;
+  }).join(' ');
+  return (
+    <>
+      <polygon points={pts} fill={fill} stroke={stroke} strokeWidth="2" />
+      <circle cx={cx} cy={cy} r={r * 0.35} fill="white" stroke={stroke} strokeWidth="1.5" />
+    </>
+  );
 }
 
 /* ── SVG Diagrams ─────────────────────────────────────────────────────────── */
 
+// Step 2: Two PET capsule halves + hex connectors → wheels
 function WheelsDiagram() {
   return (
-    <svg viewBox="0 0 250 82" width={250} height={82} aria-hidden="true" style={{ overflow: 'visible' }}>
-      <circle cx="30" cy="36" r="22" fill="#FFD54F" stroke="#F9A825" strokeWidth="2.5" />
-      <circle cx="30" cy="36" r="9" fill="white" stroke="#F9A825" strokeWidth="2" />
-      <text x="30" y="70" textAnchor="middle" fontSize="9" fill="#aaa">PP</text>
+    <svg viewBox="0 0 270 90" width={270} height={90} aria-hidden="true" style={{ overflow: 'visible' }}>
+      {/* Hex connector */}
+      <HexPoly cx={30} cy={36} r={22} />
+      <text x="30" y="72" textAnchor="middle" fontSize="9" fill="#aaa">connector</text>
       <text x="66" y="42" fontSize="20" fill="#666" textAnchor="middle">+</text>
+      {/* PET capsule half */}
       <path d="M 86 54 A 26 22 0 0 1 138 54" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2" strokeLinecap="round" />
       <line x1="86" y1="54" x2="138" y2="54" stroke="#4FC3F7" strokeWidth="2" />
-      <text x="112" y="70" textAnchor="middle" fontSize="9" fill="#aaa">PET ½</text>
-      <text x="158" y="42" fontSize="20" fill="#666" textAnchor="middle">→</text>
-      <path d="M 176 54 A 26 22 0 0 1 228 54" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2" strokeLinecap="round" />
-      <line x1="176" y1="54" x2="228" y2="54" stroke="#4FC3F7" strokeWidth="2" />
-      <circle cx="202" cy="44" r="14" fill="#FFD54F" stroke="#F9A825" strokeWidth="2" />
-      <circle cx="202" cy="44" r="6" fill="white" stroke="#F9A825" strokeWidth="1.5" />
-      <text x="202" y="70" textAnchor="middle" fontSize="9" fill="#aaa">× 2</text>
+      <text x="112" y="72" textAnchor="middle" fontSize="9" fill="#aaa">PET ½</text>
+      <text x="160" y="42" fontSize="20" fill="#666" textAnchor="middle">→</text>
+      {/* Result: capsule half with hex inside */}
+      <path d="M 178 54 A 26 22 0 0 1 230 54" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2" strokeLinecap="round" />
+      <line x1="178" y1="54" x2="230" y2="54" stroke="#4FC3F7" strokeWidth="2" />
+      <HexPoly cx={204} cy={44} r={12} />
+      <text x="204" y="72" textAnchor="middle" fontSize="9" fill="#aaa">× 2</text>
     </svg>
   );
 }
 
+// Step 3: Wheel + straw axle + wheel
 function AxleDiagram() {
   return (
-    <svg viewBox="0 0 240 75" width={240} height={75} aria-hidden="true" style={{ overflow: 'visible' }}>
+    <svg viewBox="0 0 240 80" width={240} height={80} aria-hidden="true" style={{ overflow: 'visible' }}>
+      {/* Left wheel: PET outer + hex inner */}
       <circle cx="32" cy="36" r="26" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2.5" />
-      <circle cx="32" cy="36" r="13" fill="#FFD54F" stroke="#F9A825" strokeWidth="2" />
-      <circle cx="32" cy="36" r="5" fill="white" stroke="#F9A825" strokeWidth="1.5" />
+      <HexPoly cx={32} cy={36} r={13} />
+      {/* Straw axle */}
       <rect x="32" y="32" width="176" height="8" rx="4" fill="#FF8A65" stroke="#E64A19" strokeWidth="1" />
-      <text x="120" y="65" textAnchor="middle" fontSize="9" fill="#aaa">吸管 PP straw</text>
+      <text x="120" y="68" textAnchor="middle" fontSize="9" fill="#aaa">吸管 PP straw</text>
+      {/* Right wheel */}
       <circle cx="208" cy="36" r="26" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2.5" />
-      <circle cx="208" cy="36" r="13" fill="#FFD54F" stroke="#F9A825" strokeWidth="2" />
-      <circle cx="208" cy="36" r="5" fill="white" stroke="#F9A825" strokeWidth="1.5" />
+      <HexPoly cx={208} cy={36} r={13} />
     </svg>
   );
 }
 
+// Step 4: PS tray chassis with wheel-axle sets attached
 function ChassisDiagram() {
   return (
     <svg viewBox="0 0 260 118" width={260} height={118} aria-hidden="true" style={{ overflow: 'visible' }}>
+      {/* PS tray */}
       <rect x="36" y="4" width="188" height="48" rx="10" fill="#FFCCBC" stroke="#FF8A65" strokeWidth="2.5" />
       <text x="130" y="30" textAnchor="middle" fontSize="12" fill="#FF8A65" fontWeight="800">PS Tray</text>
       <text x="130" y="45" textAnchor="middle" fontSize="9" fill="#FF8A65" opacity="0.8">（翻面向下）</text>
+      {/* Tape marks */}
       <rect x="62" y="46" width="26" height="12" rx="4" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="1.5" opacity="0.9" />
       <text x="75" y="55" textAnchor="middle" fontSize="7" fill="#4FC3F7">tape</text>
       <rect x="172" y="46" width="26" height="12" rx="4" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="1.5" opacity="0.9" />
       <text x="185" y="55" textAnchor="middle" fontSize="7" fill="#4FC3F7">tape</text>
+      {/* Left axle */}
       <rect x="24" y="68" width="90" height="7" rx="3.5" fill="#FF8A65" />
       <circle cx="28" cy="71" r="16" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2" />
-      <circle cx="28" cy="71" r="8" fill="#FFD54F" stroke="#F9A825" strokeWidth="1.5" />
+      <HexPoly cx={28} cy={71} r={8} />
       <circle cx="110" cy="71" r="16" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2" />
-      <circle cx="110" cy="71" r="8" fill="#FFD54F" stroke="#F9A825" strokeWidth="1.5" />
+      <HexPoly cx={110} cy={71} r={8} />
+      {/* Right axle */}
       <rect x="146" y="68" width="90" height="7" rx="3.5" fill="#FF8A65" />
       <circle cx="150" cy="71" r="16" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2" />
-      <circle cx="150" cy="71" r="8" fill="#FFD54F" stroke="#F9A825" strokeWidth="1.5" />
+      <HexPoly cx={150} cy={71} r={8} />
       <circle cx="232" cy="71" r="16" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2" />
-      <circle cx="232" cy="71" r="8" fill="#FFD54F" stroke="#F9A825" strokeWidth="1.5" />
+      <HexPoly cx={232} cy={71} r={8} />
     </svg>
   );
 }
 
+// Completion: full car
 function CarDiagram() {
   return (
     <svg viewBox="0 0 200 92" width={200} height={92} aria-hidden="true" style={{ overflow: 'visible' }}>
@@ -78,9 +107,9 @@ function CarDiagram() {
       <rect x="30" y="60" width="30" height="6" rx="3" fill="#FF8A65" />
       <rect x="140" y="60" width="30" height="6" rx="3" fill="#FF8A65" />
       <circle cx="45" cy="68" r="16" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2" />
-      <circle cx="45" cy="68" r="8" fill="#FFD54F" stroke="#F9A825" strokeWidth="1.5" />
+      <HexPoly cx={45} cy={68} r={8} />
       <circle cx="155" cy="68" r="16" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2" />
-      <circle cx="155" cy="68" r="8" fill="#FFD54F" stroke="#F9A825" strokeWidth="1.5" />
+      <HexPoly cx={155} cy={68} r={8} />
     </svg>
   );
 }
@@ -102,10 +131,10 @@ const ROLES = [
     desc: { zh: '你的「輪匡」它很強韌，不怕撞！', ja: '「ホイールリム」、強くて衝撃に強い！', en: 'Your "Wheel Rim" — strong and impact-resistant!' } as Tri,
   },
   {
-    emoji: '⚙️',
-    material: { zh: '連接件 (PP)', ja: 'コネクター (PP)', en: 'Connector (PP)' } as Tri,
-    role: { zh: '輪胎', ja: 'タイヤ', en: 'Wheel / Tire' } as Tri,
-    desc: { zh: '你的「輪胎」。有他組合就可以跑起來！', ja: '「タイヤ」、これを組み合わせれば走れるよ！', en: 'Your "Tire" — combine it and the wheels will roll!' } as Tri,
+    emoji: '🔷',
+    material: { zh: '六角連接件 (PP)', ja: '六角コネクター (PP)', en: 'Hex Connector (PP)' } as Tri,
+    role: { zh: '輪胎 / Universal Connector', ja: 'タイヤ / ユニバーサルコネクター', en: 'Wheel / Universal Connector' } as Tri,
+    desc: { zh: '你的「六角連接件」，讓輪子緊密結合！', ja: '「六角コネクター」、タイヤをしっかり固定する！', en: 'Your "Hex Connector" — makes the wheels click together tight!' } as Tri,
   },
   {
     emoji: '🍱',
@@ -132,9 +161,9 @@ const ASSEMBLY_STEPS: StepData[] = [
   {
     title: { zh: 'Step 2 — 製作超級輪胎', ja: 'Step 2 — スーパータイヤを作ろう', en: 'Step 2 — Make the Super Wheels' },
     desc: {
-      zh: '將 2 個 PP 連接件分別卡進 2 個 PET 扭蛋殼的一半，做成半輪子，確保緊密結合。',
-      ja: '2つのPPコネクターをそれぞれ2つのPETカプセルの半分にはめ込んで半輪を作ろう。しっかり固定してね。',
-      en: 'Press 2 PP connectors into 2 PET capsule halves to make two half-wheels. Make sure they click in tight.',
+      zh: '將 2 個六角連接件分別卡進 2 個 PET 扭蛋殼的一半，做成半輪子，確保緊密結合。',
+      ja: '2つの六角コネクターをそれぞれ2つのPETカプセルの半分にはめ込んで半輪を作ろう。しっかり固定してね。',
+      en: 'Press 2 hex connectors into 2 PET capsule halves to make two half-wheels. Make sure they click in tight.',
     },
     mascotSays: {
       zh: '記得用力壓下去，PP 材質很強韌，不用擔心它會壞掉！',
@@ -146,9 +175,9 @@ const ASSEMBLY_STEPS: StepData[] = [
   {
     title: { zh: 'Step 3 — 安裝動力轉軸', ja: 'Step 3 — ダイナミックアクスルを取り付けよう', en: 'Step 3 — Install the Dynamic Axle' },
     desc: {
-      zh: '拿出兩根吸管，各自穿過一組連接件的中心孔洞。現在你有了兩組可以自由轉動的「輪軸組」！',
-      ja: '2本のストローをそれぞれコネクターの中心の穴に通してね。これで自由に回転できる「ホイールアクスルセット」が2つできたよ！',
-      en: 'Thread a straw through the center hole of each connector set. You now have two freely-spinning wheel-axle sets!',
+      zh: '拿出兩根吸管，各自穿過一組六角連接件的中心孔洞。現在你有了兩組可以自由轉動的「輪軸組」！',
+      ja: '2本のストローをそれぞれ六角コネクターの中心の穴に通してね。これで自由に回転できる「ホイールアクスルセット」が2つできたよ！',
+      en: 'Thread a straw through the center hole of each hex connector set. You now have two freely-spinning wheel-axle sets!',
     },
     mascotSays: {
       zh: '吸管就是你的動力轉軸！讓輪子可以自由旋轉喔！',
@@ -178,16 +207,26 @@ const BACK_BTN: Tri = { zh: '上一步', ja: '前のステップ', en: 'Back' };
 const DONE_BTN: Tri = { zh: '完成！去回答問題', ja: '完成！質問に答えよう', en: 'Done! Answer Questions' };
 const COMPLETE_TITLE: Tri = { zh: '完成了嗎？🏆', ja: '完成しましたか？🏆', en: 'Did You Finish? 🏆' };
 const PHOTO_PROMPT: Tri = {
-  zh: '幫你的帥車拍個照吧！📸\n然後回答幾個小問題，讓我知道你學到了什麼！',
-  ja: 'かっこいい車の写真を撮ろう！📸\nそれからいくつか質問に答えてね！',
-  en: 'Take a photo of your cool car! 📸\nThen answer a few questions so I know what you learned!',
+  zh: '幫你的帥車拍個照吧！📸\n拍完照後，回答幾個小問題！',
+  ja: 'かっこいい車の写真を撮ろう！📸\n撮影後にいくつか質問に答えてね！',
+  en: 'Take a photo of your cool car! 📸\nThen answer a few questions!',
 };
+const TAKE_PHOTO_BTN: Tri = { zh: '📸 拍照', ja: '📸 写真を撮る', en: '📸 Take Photo' };
+const RETAKE_BTN: Tri = { zh: '重拍', ja: '撮り直す', en: 'Retake' };
+const PHOTO_SAVED: Tri = { zh: '✅ 照片已儲存！', ja: '✅ 写真を保存しました！', en: '✅ Photo saved!' };
+const SKIP_PHOTO_BTN: Tri = { zh: '略過，繼續', ja: 'スキップして続ける', en: 'Skip & Continue' };
 
 /* ── Component ────────────────────────────────────────────────────────────── */
 
-export function PhaseMaking({ onDone }: Props) {
+export function PhaseMaking({ onDone, onBack, sessionId }: Props) {
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);
+
+  // Camera state for completion step
+  const [cameraOpen, setCameraOpen] = useState(false);
+  const [photoUrl, setPhotoUrl] = useState<string | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const advance = () => {
     if (step === 4) { onDone(); return; }
@@ -195,9 +234,50 @@ export function PhaseMaking({ onDone }: Props) {
     setStep(s => s + 1);
   };
   const back = () => {
+    if (step === 0) { onBack?.(); return; }
     setDir(-1);
     setStep(s => s - 1);
   };
+
+  const openCamera = async () => {
+    setCameraOpen(true);
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { facingMode: 'environment' },
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+        videoRef.current.play();
+      }
+    } catch {
+      setCameraOpen(false);
+    }
+  };
+
+  const capturePhoto = () => {
+    const video = videoRef.current;
+    if (!video) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth || 640;
+    canvas.height = video.videoHeight || 480;
+    canvas.getContext('2d')!.drawImage(video, 0, 0);
+    const url = canvas.toDataURL('image/jpeg', 0.75);
+    streamRef.current?.getTracks().forEach(t => t.stop());
+    setCameraOpen(false);
+    setPhotoUrl(url);
+    if (sessionId) savePhoto(sessionId, url);
+  };
+
+  const retakePhoto = () => {
+    setPhotoUrl(null);
+    openCamera();
+  };
+
+  // Cleanup stream on unmount
+  useEffect(() => {
+    return () => { streamRef.current?.getTracks().forEach(t => t.stop()); };
+  }, []);
 
   return (
     <div className="phase-container phase-making">
@@ -267,6 +347,32 @@ export function PhaseMaking({ onDone }: Props) {
             <p className="making-card__desc" style={{ whiteSpace: 'pre-line' }}>
               <T s={PHOTO_PROMPT} />
             </p>
+
+            {/* Camera section */}
+            {!cameraOpen && !photoUrl && (
+              <button className="btn-secondary" style={{ marginTop: 8 }} onClick={openCamera}>
+                <T s={TAKE_PHOTO_BTN} />
+              </button>
+            )}
+
+            {cameraOpen && (
+              <div className="photo-capture">
+                <video ref={videoRef} playsInline muted className="photo-preview" />
+                <button className="btn-primary" onClick={capturePhoto}>
+                  <T s={TAKE_PHOTO_BTN} />
+                </button>
+              </div>
+            )}
+
+            {photoUrl && (
+              <div className="photo-result">
+                <img src={photoUrl} alt="Your car" className="photo-thumbnail" />
+                <p className="photo-saved-label"><T s={PHOTO_SAVED} /></p>
+                <button className="btn-secondary" style={{ fontSize: '0.85rem', padding: '8px 20px' }} onClick={retakePhoto}>
+                  <T s={RETAKE_BTN} />
+                </button>
+              </div>
+            )}
           </motion.div>
         )}
       </AnimatePresence>
@@ -278,14 +384,26 @@ export function PhaseMaking({ onDone }: Props) {
       </div>
 
       <div style={{ display: 'flex', gap: 12 }}>
-        {step > 0 && (
+        {(step > 0 || onBack) && (
           <button className="btn-secondary" onClick={back}>
             <T s={BACK_BTN} />
           </button>
         )}
         <button className="btn-primary" onClick={advance}>
-          <T s={step === 4 ? DONE_BTN : NEXT_BTN} />
+          {step === 4
+            ? <T s={DONE_BTN} />
+            : <T s={NEXT_BTN} />
+          }
         </button>
+        {step === 4 && !photoUrl && (
+          <button
+            className="btn-secondary"
+            style={{ fontSize: '0.85rem' }}
+            onClick={onDone}
+          >
+            <T s={SKIP_PHOTO_BTN} />
+          </button>
+        )}
       </div>
     </div>
   );

@@ -162,7 +162,11 @@ function AppInner() {
 
         {phase === 'phase3' && (
           <PageWrap key="phase3">
-            <PhaseMaking onDone={() => setPhase('survey-post')} />
+            <PhaseMaking
+              onDone={() => setPhase('survey-post')}
+              onBack={() => setPhase('phase2')}
+              sessionId={sessionId ?? ''}
+            />
           </PageWrap>
         )}
 

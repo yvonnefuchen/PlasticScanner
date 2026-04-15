@@ -78,6 +78,7 @@ export default function Admin() {
               <tr>
                 <th>#</th>
                 <th>Time</th>
+                <th>Photo</th>
                 <th>Pre: Heard PP/PS?</th>
                 <th>Pre: Same plastic?</th>
                 <th>Pre: Microwave safe?</th>
@@ -97,6 +98,11 @@ export default function Admin() {
                   <td style={{ color: 'rgba(240,244,255,0.4)', fontSize: '0.75rem' }}>{i + 1}</td>
                   <td style={{ color: 'rgba(240,244,255,0.5)', fontSize: '0.75rem' }}>
                     {new Date(s.timestamp).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                  </td>
+                  <td>
+                    {s.photoUrl
+                      ? <img src={s.photoUrl} alt="car" className="admin-photo" />
+                      : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
                   </td>
                   <Cell v={s.pre.q1_heard_pp_ps} />
                   <Cell v={s.pre.q2_same_plastic} correct={s.pre.q2_same_plastic === 'no' ? true : s.pre.q2_same_plastic === 'yes' ? false : null} />
