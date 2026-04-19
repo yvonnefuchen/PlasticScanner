@@ -1,4 +1,5 @@
 export type PlasticId = 'PET' | 'HDPE' | 'PP' | 'PS' | 'PVC';
+export type BinCategory = 'blue' | 'green' | 'red';
 
 export interface Tri {
   zh: string;
@@ -18,6 +19,8 @@ export interface PlasticType {
   knowledgeHint: Tri;
   siblings: Tri;
   wrongHints: Partial<Record<PlasticId, Tri>>;
+  binCategory: BinCategory;
+  binWrongHints: Partial<Record<BinCategory, Tri>>;
 }
 
 export const PLASTICS: Record<PlasticId, PlasticType> = {
@@ -53,6 +56,11 @@ export const PLASTICS: Record<PlasticId, PlasticType> = {
       en: 'Drink bottles, juice bottles, mineral water bottles',
     },
     wrongHints: {},
+    binCategory: 'blue',
+    binWrongHints: {
+      green: { zh: '綠色桶是給 PP 瓶蓋的！PET 寶特瓶要放藍色桶！', ja: '緑のゴミ箱はPPキャップ用だよ！PETボトルは青いゴミ箱へ！', en: 'Green bin is for PP caps! PET bottles go in the blue bin!' },
+      red:   { zh: '紅色桶是特殊材質用的！PET 可以普通回收，放藍色桶！', ja: '赤いゴミ箱は特殊素材用だよ！PETは一般回収できるから青いゴミ箱へ！', en: 'Red is for special plastics! PET is standard recycling — use the blue bin!' },
+    },
   },
 
   HDPE: {
@@ -87,6 +95,11 @@ export const PLASTICS: Record<PlasticId, PlasticType> = {
       en: 'Milk jugs, shampoo bottles, cleaning product bottles',
     },
     wrongHints: {},
+    binCategory: 'red',
+    binWrongHints: {
+      blue: { zh: '藍色桶是給 PET 飲料瓶的！HDPE 要放紅色桶（特殊設施）！', ja: '青いゴミ箱はPETボトル用だよ！HDPEは赤いゴミ箱（特殊施設）へ！', en: 'Blue bin is for PET bottles! HDPE goes in the red bin (special facility)!' },
+      green: { zh: '綠色桶是給 PP 瓶蓋的！HDPE 要放紅色桶（特殊設施）！', ja: '緑のゴミ箱はPPキャップ用だよ！HDPEは赤いゴミ箱（特殊施設）へ！', en: 'Green bin is for PP caps! HDPE goes in the red bin (special facility)!' },
+    },
   },
 
   PP: {
@@ -121,6 +134,11 @@ export const PLASTICS: Record<PlasticId, PlasticType> = {
       en: 'Soy milk bottles, yogurt containers, straws',
     },
     wrongHints: {},
+    binCategory: 'green',
+    binWrongHints: {
+      blue: { zh: '藍色桶是給 PET 飲料瓶的！PP 瓶蓋要放綠色桶！', ja: '青いゴミ箱はPETボトル用だよ！PPキャップは緑のゴミ箱へ！', en: 'Blue bin is for PET bottles! PP caps go in the green bin!' },
+      red:  { zh: '紅色桶是特殊材質用的！PP 是一般塑膠，放綠色桶！', ja: '赤いゴミ箱は特殊素材用だよ！PPは一般プラスチックで緑のゴミ箱へ！', en: 'Red is for special plastics! PP is general plastic — use the green bin!' },
+    },
   },
 
   PS: {
@@ -176,6 +194,11 @@ export const PLASTICS: Record<PlasticId, PlasticType> = {
         en: 'PVC is used in pipes and floors! I (PS) appear in food packaging and foam. Try again?',
       },
     },
+    binCategory: 'red',
+    binWrongHints: {
+      blue: { zh: '藍色桶是給 PET 飲料瓶的！PS 托盤要放紅色桶（特殊設施）！', ja: '青いゴミ箱はPETボトル用だよ！PSトレイは赤いゴミ箱（特殊施設）へ！', en: 'Blue bin is for PET bottles! PS trays need the red bin (special facility)!' },
+      green: { zh: '綠色桶是給 PP 瓶蓋的！PS 比較難回收，要放紅色桶（特殊設施）！', ja: '緑のゴミ箱はPPキャップ用だよ！PSは回収が難しく赤いゴミ箱（特殊施設）へ！', en: 'Green bin is for PP caps! PS is harder to recycle — use the red bin (special facility)!' },
+    },
   },
 
   PVC: {
@@ -210,6 +233,11 @@ export const PLASTICS: Record<PlasticId, PlasticType> = {
       en: 'Water pipes, floor tiles, rain coats',
     },
     wrongHints: {},
+    binCategory: 'red',
+    binWrongHints: {
+      blue: { zh: '藍色桶是給 PET 飲料瓶的！PVC 不容易回收，要放紅色桶（特殊設施）！', ja: '青いゴミ箱はPETボトル用だよ！PVCはリサイクルが難しく赤いゴミ箱（特殊施設）へ！', en: 'Blue bin is for PET bottles! PVC is hard to recycle — use the red bin (special facility)!' },
+      green: { zh: '綠色桶是給 PP 瓶蓋的！PVC 不容易回收，要放紅色桶（特殊設施）！', ja: '緑のゴミ箱はPPキャップ用だよ！PVCはリサイクルが難しく赤いゴミ箱（特殊施設）へ！', en: 'Green bin is for PP caps! PVC is hard to recycle — use the red bin (special facility)!' },
+    },
   },
 };
 

@@ -2,24 +2,54 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlasticMascot } from '../components/PlasticMascot';
 import { T } from '../components/T';
-import { PLASTICS, type PlasticId, type PlasticType } from '../data/plastics';
+import type { BinCategory, PlasticType, Tri } from '../data/plastics';
 
 interface Props {
   plastic: PlasticType;
   onCorrect: () => void;
 }
 
-const QUESTION = { zh: '你覺得我是哪一種塑膠？', ja: '僕はどんなプラスチックだと思う？', en: 'What type of plastic am I?' };
-const TRY_AGAIN = { zh: '再試一次！', ja: 'もう一度試して！', en: 'Try again!' };
+const QUESTION: Tri = { zh: '這個塑膠該放進哪個桶？', ja: 'このプラスチックはどのゴミ箱に？', en: 'Which bin does this plastic go in?' };
+const TRY_AGAIN: Tri = { zh: '再試一次！', ja: 'もう一度試して！', en: 'Try again!' };
 
-const OPTIONS: PlasticId[] = ['PET', 'HDPE', 'PP', 'PS', 'PVC'];
+interface BinOption {
+  category: BinCategory;
+  label: Tri;
+  sublabel: Tri;
+  color: string;
+  lightColor: string;
+}
+
+const BIN_OPTIONS: BinOption[] = [
+  {
+    category: 'blue',
+    label:    { zh: '🔵 藍色桶', ja: '🔵 青いゴミ箱', en: '🔵 Blue Bin' },
+    sublabel: { zh: 'PET 瓶子', ja: 'PETボトル', en: 'PET Bottles' },
+    color: '#4FC3F7',
+    lightColor: '#E1F5FE',
+  },
+  {
+    category: 'green',
+    label:    { zh: '🟢 綠色桶', ja: '🟢 緑のゴミ箱', en: '🟢 Green Bin' },
+    sublabel: { zh: 'PP 瓶蓋 & 一般塑膠', ja: 'PPキャップ & 一般プラスチック', en: 'PP Caps & General Plastics' },
+    color: '#81C784',
+    lightColor: '#E8F5E9',
+  },
+  {
+    category: 'red',
+    label:    { zh: '🔴 紅色桶', ja: '🔴 赤いゴミ箱', en: '🔴 Red Bin' },
+    sublabel: { zh: '其他（特殊設施）', ja: 'その他（特殊施設）', en: 'Others (Special Facility)' },
+    color: '#EF5350',
+    lightColor: '#FFEBEE',
+  },
+];
 
 export function PhaseQuiz({ plastic, onCorrect }: Props) {
-  const [wrongAnswer, setWrongAnswer] = useState<PlasticId | null>(null);
+  const [wrongAnswer, setWrongAnswer] = useState<BinCategory | null>(null);
   const [shake, setShake] = useState(false);
 
-  const handleChoice = (chosen: PlasticId) => {
-    if (chosen === plastic.id) {
+  const handleChoice = (chosen: BinCategory) => {
+    if (chosen === plastic.binCategory) {
       onCorrect();
     } else {
       setWrongAnswer(chosen);
@@ -28,7 +58,7 @@ export function PhaseQuiz({ plastic, onCorrect }: Props) {
     }
   };
 
-  const hint = wrongAnswer ? plastic.wrongHints[wrongAnswer] : null;
+  const hint = wrongAnswer ? plastic.binWrongHints[wrongAnswer] : null;
 
   return (
     <div className="phase-container phase-quiz">
@@ -70,27 +100,26 @@ export function PhaseQuiz({ plastic, onCorrect }: Props) {
         )}
       </AnimatePresence>
 
-      {/* Options */}
+      {/* 3-bin options */}
       <motion.div
         className="quiz-grid"
         animate={shake ? { x: [-8, 8, -6, 6, 0] } : { x: 0 }}
         transition={{ duration: 0.4 }}
       >
-        {OPTIONS.map((id) => {
-          const p = PLASTICS[id];
-          const isWrong = wrongAnswer === id;
+        {BIN_OPTIONS.map((bin) => {
+          const isWrong = wrongAnswer === bin.category;
           return (
             <button
-              key={id}
-              className={`quiz-btn ${isWrong ? 'quiz-btn--wrong' : ''}`}
+              key={bin.category}
+              className={`quiz-btn quiz-btn--bin ${isWrong ? 'quiz-btn--wrong' : ''}`}
               style={{
-                '--btn-color': p.color,
-                '--btn-light': p.lightColor,
+                '--btn-color': bin.color,
+                '--btn-light': bin.lightColor,
               } as React.CSSProperties}
-              onClick={() => handleChoice(id)}
+              onClick={() => handleChoice(bin.category)}
             >
-              <span className="quiz-btn__code">{p.resinCode}</span>
-              <span className="quiz-btn__id">{p.id}</span>
+              <span className="quiz-btn__id"><T s={bin.label} /></span>
+              <span className="quiz-btn__sublabel"><T s={bin.sublabel} /></span>
               {isWrong && <span className="quiz-btn__x">✕</span>}
             </button>
           );

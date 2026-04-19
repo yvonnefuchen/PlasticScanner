@@ -5,6 +5,7 @@ import { LangProvider, useLang } from './context/LangContext';
 import { LangSelector } from './components/LangSelector';
 
 import { PhaseIdle } from './phases/PhaseIdle';
+import { PhaseInvisibleSecret } from './phases/PhaseInvisibleSecret';
 import { PhaseScanner, type ScannerHandle } from './phases/PhaseScanner';
 import { PhaseIdentified } from './phases/PhaseIdentified';
 import { PhaseQuiz } from './phases/PhaseQuiz';
@@ -20,6 +21,7 @@ import { identifyPlastic } from './services/scanner';
 type AppPhase =
   | 'idle'
   | 'survey-pre'
+  | 'phase0'
   | 'scanning'
   | 'countdown'
   | 'analyzing'
@@ -103,7 +105,13 @@ function AppInner() {
 
         {phase === 'survey-pre' && (
           <PageWrap key="survey-pre">
-            <PhaseSurveyPre onComplete={(id) => { setSessionId(id); setPhase('scanning'); }} />
+            <PhaseSurveyPre onComplete={(id) => { setSessionId(id); setPhase('phase0'); }} />
+          </PageWrap>
+        )}
+
+        {phase === 'phase0' && (
+          <PageWrap key="phase0">
+            <PhaseInvisibleSecret onNext={() => setPhase('scanning')} />
           </PageWrap>
         )}
 

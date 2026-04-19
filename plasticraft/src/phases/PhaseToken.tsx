@@ -16,6 +16,11 @@ const CAPSULE_DESC = {
   en: 'The hexagonal connector inside is made from PP — the same material as your token! Open it up and get ready to build!',
 };
 const CONFIRM_BTN = { zh: '我拿到扭蛋了！開始製作！', ja: 'カプセルをゲットした！作ろう！', en: "Got my capsule! Let's build!" };
+const PP_MAGIC = {
+  zh: '你從瓶蓋拿到的代幣，還有你夾到的連接器——都是 PP！同一種材料，可以變成瓶蓋，也可以變成玩具零件。這就是回收的魔法！',
+  ja: 'キャップからもらったトークンも、掴んだコネクタも、どちらもPP！同じ素材が、ボトルキャップにも、おもちゃのパーツにもなれる。それがリサイクルの魔法！',
+  en: "The token you got from the PP cap, and the connector you grabbed — both made of PP! Same material, can become a bottle cap OR a toy part. That's the magic of recycling!",
+};
 
 /* ── PP Bottle Cap Token ── */
 function PPToken({ size = 110 }: { size?: number }) {
@@ -217,6 +222,16 @@ export function PhaseToken({ onNext }: Props) {
               <div className="token-card__icon">🔷</div>
               <p><T s={CAPSULE_DESC} /></p>
             </div>
+            <motion.div
+              className="token-card"
+              style={{ maxWidth: 480 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.8 }}
+            >
+              <div className="token-card__icon">♻️</div>
+              <p><T s={PP_MAGIC} /></p>
+            </motion.div>
             <motion.button
               className="btn-primary"
               onClick={onNext}

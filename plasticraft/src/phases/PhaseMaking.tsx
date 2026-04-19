@@ -126,24 +126,28 @@ const ROLES_TITLE: Tri = { zh: 'Step 1 — 角色分配', ja: 'Step 1 — 役割
 const ROLES = [
   {
     emoji: '🥚',
+    badge: { label: '🔵 PET ①', color: '#4FC3F7', bg: 'rgba(79,195,247,0.15)' },
     material: { zh: '扭蛋殼 (PET)', ja: 'カプセル (PET)', en: 'Capsule (PET)' } as Tri,
     role: { zh: '輪匡', ja: 'ホイールリム', en: 'Wheel Rim' } as Tri,
     desc: { zh: '你的「輪匡」它很強韌，不怕撞！', ja: '「ホイールリム」、強くて衝撃に強い！', en: 'Your "Wheel Rim" — strong and impact-resistant!' } as Tri,
   },
   {
     emoji: '🔷',
+    badge: { label: '🟢 PP ⑤', color: '#81C784', bg: 'rgba(129,199,132,0.15)' },
     material: { zh: '六角連接件 (PP)', ja: '六角コネクター (PP)', en: 'Hex Connector (PP)' } as Tri,
     role: { zh: '輪胎 / Universal Connector', ja: 'タイヤ / ユニバーサルコネクター', en: 'Wheel / Universal Connector' } as Tri,
     desc: { zh: '你的「六角連接件」，讓輪子緊密結合！', ja: '「六角コネクター」、タイヤをしっかり固定する！', en: 'Your "Hex Connector" — makes the wheels click together tight!' } as Tri,
   },
   {
     emoji: '🍱',
+    badge: { label: '🔴 PS ⑥', color: '#EF5350', bg: 'rgba(239,83,80,0.15)' },
     material: { zh: '肉托盤 (PS)', ja: 'ミートトレイ (PS)', en: 'Meat Tray (PS)' } as Tri,
     role: { zh: '車架', ja: 'シャーシ', en: 'Chassis' } as Tri,
     desc: { zh: '你的「車架」。它很輕，可以讓車子跑很快！', ja: '「シャーシ」、軽いから車が速く走れるよ！', en: 'Your "Chassis" — lightweight, so your car goes fast!' } as Tri,
   },
   {
     emoji: '🥤',
+    badge: { label: '🟢 PP ⑤', color: '#81C784', bg: 'rgba(129,199,132,0.15)' },
     material: { zh: '吸管 (PP)', ja: 'ストロー (PP)', en: 'Straw (PP)' } as Tri,
     role: { zh: '動力轉軸', ja: 'ダイナミックアクスル', en: 'Dynamic Axle' } as Tri,
     desc: { zh: '你的「動力轉軸」。細長堅韌，能支撐輪胎順暢地轉動！', ja: '「ダイナミックアクスル」、細くて強く、タイヤをスムーズに回転させる！', en: 'Your "Dynamic Axle" — slender and tough, keeps the wheels spinning smoothly!' } as Tri,
@@ -202,6 +206,18 @@ const ASSEMBLY_STEPS: StepData[] = [
   },
 ];
 
+const SUMMARY_TITLE: Tri = { zh: '你知道嗎？', ja: '知ってた？', en: 'Did You Know?' };
+const SUMMARY_TEXT: Tri = {
+  zh: '你的戰車含有 3 種不同的塑膠！混在一起 = 垃圾。分類回收 = 有機會變成新的東西。',
+  ja: 'あなたのバトルカーには3種類の異なるプラスチックが入っています！混ぜたらゴミ。分別してリサイクル = 新しいものに生まれ変われるチャンス。',
+  en: 'Your battle car contains 3 different plastics! Mixed together = trash. Separated for recycling = chance to become something new.',
+};
+const SUMMARY_MATERIALS = [
+  { label: '🔵 PET ①', role: { zh: '扭蛋殼 → 輪框', ja: 'カプセル → ホイール', en: 'Capsule → Wheel Rim' } as Tri, color: '#4FC3F7', bg: 'rgba(79,195,247,0.12)' },
+  { label: '🟢 PP ⑤',  role: { zh: '瓶蓋 / 連接件 / 吸管', ja: 'キャップ / コネクター / ストロー', en: 'Cap / Connector / Straw' } as Tri, color: '#81C784', bg: 'rgba(129,199,132,0.12)' },
+  { label: '🔴 PS ⑥',  role: { zh: '托盤 → 車架（特殊回收）', ja: 'トレイ → シャーシ（特別回収）', en: 'Tray → Chassis (Special Recycling)' } as Tri, color: '#EF5350', bg: 'rgba(239,83,80,0.12)' },
+];
+
 const NEXT_BTN: Tri = { zh: '下一步', ja: '次のステップ', en: 'Next Step' };
 const BACK_BTN: Tri = { zh: '上一步', ja: '前のステップ', en: 'Back' };
 const DONE_BTN: Tri = { zh: '完成！去回答問題', ja: '完成！質問に答えよう', en: 'Done! Answer Questions' };
@@ -229,7 +245,7 @@ export function PhaseMaking({ onDone, onBack, sessionId }: Props) {
   const streamRef = useRef<MediaStream | null>(null);
 
   const advance = () => {
-    if (step === 4) { onDone(); return; }
+    if (step === 5) { onDone(); return; }
     setDir(1);
     setStep(s => s + 1);
   };
@@ -299,6 +315,12 @@ export function PhaseMaking({ onDone, onBack, sessionId }: Props) {
                   <span className="role-item__emoji">{r.emoji}</span>
                   <div>
                     <strong><T s={r.material} /></strong>
+                    <span
+                      className="material-badge"
+                      style={{ color: r.badge.color, background: r.badge.bg, borderColor: r.badge.color }}
+                    >
+                      {r.badge.label}
+                    </span>
                     <span className="role-badge"><T s={r.role} /></span>
                     <p><T s={r.desc} /></p>
                   </div>
@@ -332,6 +354,35 @@ export function PhaseMaking({ onDone, onBack, sessionId }: Props) {
         })()}
 
         {step === 4 && (
+          <motion.div
+            key="summary"
+            className="making-card"
+            style={{ textAlign: 'center' }}
+            initial={{ opacity: 0, x: 50 * dir }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -50 * dir }}
+          >
+            <h3 className="making-card__title"><T s={SUMMARY_TITLE} /></h3>
+            <div className="material-summary-list">
+              {SUMMARY_MATERIALS.map((m, i) => (
+                <motion.div
+                  key={m.label}
+                  className="material-summary-row"
+                  style={{ borderColor: m.color, background: m.bg }}
+                  initial={{ opacity: 0, x: -20 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: i * 0.15 }}
+                >
+                  <span className="material-summary-row__label">{m.label}</span>
+                  <span className="material-summary-row__role"><T s={m.role} /></span>
+                </motion.div>
+              ))}
+            </div>
+            <p className="making-card__desc" style={{ marginTop: 16 }}><T s={SUMMARY_TEXT} /></p>
+          </motion.div>
+        )}
+
+        {step === 5 && (
           <motion.div
             key="complete"
             className="making-card"
@@ -378,7 +429,7 @@ export function PhaseMaking({ onDone, onBack, sessionId }: Props) {
       </AnimatePresence>
 
       <div className="progress-dots">
-        {[0, 1, 2, 3, 4].map(i => (
+        {[0, 1, 2, 3, 4, 5].map(i => (
           <span key={i} className={`dot ${step === i ? 'dot--active' : ''}`} />
         ))}
       </div>
@@ -390,12 +441,12 @@ export function PhaseMaking({ onDone, onBack, sessionId }: Props) {
           </button>
         )}
         <button className="btn-primary" onClick={advance}>
-          {step === 4
+          {step === 5
             ? <T s={DONE_BTN} />
             : <T s={NEXT_BTN} />
           }
         </button>
-        {step === 4 && !photoUrl && (
+        {step === 5 && !photoUrl && (
           <button
             className="btn-secondary"
             style={{ fontSize: '0.85rem' }}
