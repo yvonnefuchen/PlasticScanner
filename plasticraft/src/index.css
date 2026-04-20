@@ -948,3 +948,25 @@ td.cell-empty   { color: rgba(240,244,255,0.25); }
 .phase-token {
   overflow-y: auto;
 }
+
+/* ── Survey open text textarea ───────────────────────────────────────────── */
+.survey-open-text {
+  width: 100%;
+  background: var(--surface2);
+  border: 1.5px solid rgba(110, 231, 247, 0.3);
+  border-radius: 10px;
+  color: var(--text);
+  font-family: var(--font);
+  font-size: 0.95rem;
+  line-height: 1.5;
+  padding: 10px 14px;
+  resize: vertical;
+  outline: none;
+  transition: border-color 0.15s;
+}
+.survey-open-text:focus {
+  border-color: var(--primary);
+}
+.survey-open-text::placeholder {
+  color: var(--text-dim);
+}
