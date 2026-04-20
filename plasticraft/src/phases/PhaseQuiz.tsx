@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PlasticMascot } from '../components/PlasticMascot';
 import { T } from '../components/T';
+import { BinCharacter } from '../components/PlasticShapes';
 import type { BinCategory, PlasticType, Tri } from '../data/plastics';
 
 interface Props {
@@ -118,6 +119,7 @@ export function PhaseQuiz({ plastic, onCorrect }: Props) {
               } as React.CSSProperties}
               onClick={() => handleChoice(bin.category)}
             >
+              <BinCharacter type={bin.category} size={58} />
               <span className="quiz-btn__id"><T s={bin.label} /></span>
               <span className="quiz-btn__sublabel"><T s={bin.sublabel} /></span>
               {isWrong && <span className="quiz-btn__x">✕</span>}

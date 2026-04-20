@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { T } from '../components/T';
+import { BinCharacter } from '../components/PlasticShapes';
 import type { Tri } from '../data/plastics';
 import { savePhoto } from '../services/survey';
 
@@ -213,9 +214,9 @@ const SUMMARY_TEXT: Tri = {
   en: 'Your battle car contains 3 different plastics! Mixed together = trash. Separated for recycling = chance to become something new.',
 };
 const SUMMARY_MATERIALS = [
-  { label: '🔵 PET ①', role: { zh: '扭蛋殼 → 輪框', ja: 'カプセル → ホイール', en: 'Capsule → Wheel Rim' } as Tri, color: '#4FC3F7', bg: 'rgba(79,195,247,0.12)' },
-  { label: '🟢 PP ⑤',  role: { zh: '瓶蓋 / 連接件 / 吸管', ja: 'キャップ / コネクター / ストロー', en: 'Cap / Connector / Straw' } as Tri, color: '#81C784', bg: 'rgba(129,199,132,0.12)' },
-  { label: '🔴 PS ⑥',  role: { zh: '托盤 → 車架（特殊回收）', ja: 'トレイ → シャーシ（特別回収）', en: 'Tray → Chassis (Special Recycling)' } as Tri, color: '#EF5350', bg: 'rgba(239,83,80,0.12)' },
+  { label: '🔵 PET ①', binType: 'blue' as const, role: { zh: '扭蛋殼 → 輪框', ja: 'カプセル → ホイール', en: 'Capsule → Wheel Rim' } as Tri, color: '#4FC3F7', bg: 'rgba(79,195,247,0.12)' },
+  { label: '🟢 PP ⑤',  binType: 'green' as const, role: { zh: '瓶蓋 / 連接件 / 吸管', ja: 'キャップ / コネクター / ストロー', en: 'Cap / Connector / Straw' } as Tri, color: '#81C784', bg: 'rgba(129,199,132,0.12)' },
+  { label: '🔴 PS ⑥',  binType: 'red' as const, role: { zh: '托盤 → 車架（特殊回收）', ja: 'トレイ → シャーシ（特別回収）', en: 'Tray → Chassis (Special Recycling)' } as Tri, color: '#EF5350', bg: 'rgba(239,83,80,0.12)' },
 ];
 
 const NEXT_BTN: Tri = { zh: '下一步', ja: '次のステップ', en: 'Next Step' };
@@ -373,8 +374,11 @@ export function PhaseMaking({ onDone, onBack, sessionId }: Props) {
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ delay: i * 0.15 }}
                 >
-                  <span className="material-summary-row__label">{m.label}</span>
-                  <span className="material-summary-row__role"><T s={m.role} /></span>
+                  <BinCharacter type={m.binType} size={52} />
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
+                    <span className="material-summary-row__label">{m.label}</span>
+                    <span className="material-summary-row__role"><T s={m.role} /></span>
+                  </div>
                 </motion.div>
               ))}
             </div>

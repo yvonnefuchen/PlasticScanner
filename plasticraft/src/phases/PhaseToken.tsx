@@ -120,17 +120,11 @@ function ClawMachine({ dropped }: { dropped: boolean }) {
 function CapsuleResult() {
   return (
     <svg viewBox="0 0 200 130" width={200} height={130} aria-hidden="true">
-      {/* Left half capsule */}
-      <path d="M 30 65 A 40 35 0 0 1 100 65" fill="#FFD54F" stroke="#F9A825" strokeWidth="2.5" />
-      <path d="M 30 65 L 100 65" stroke="#F9A825" strokeWidth="2.5" />
-      {/* Right half capsule */}
-      <path d="M 100 65 A 40 35 0 0 0 170 65" fill="#FFF9C4" stroke="#F9A825" strokeWidth="2.5" />
-      <path d="M 100 65 L 170 65" stroke="#F9A825" strokeWidth="2.5" />
-      {/* Hex connector in center */}
-      <HexConnector cx={100} cy={65} r={28} fill="#FF8A65" stroke="#E64A19" />
+      {/* Hex connector only — capsule halves removed */}
+      <HexConnector cx={100} cy={65} r={32} fill="#FF8A65" stroke="#E64A19" />
       {/* Label */}
-      <text x="100" y="108" textAnchor="middle" fontSize="11" fontWeight="700" fill="#FFD54F" fontFamily="system-ui">Universal Connector</text>
-      <text x="100" y="122" textAnchor="middle" fontSize="9" fill="rgba(240,244,255,0.5)" fontFamily="system-ui">PP ⑤</text>
+      <text x="100" y="112" textAnchor="middle" fontSize="11" fontWeight="700" fill="#FFD54F" fontFamily="system-ui">Universal Connector</text>
+      <text x="100" y="126" textAnchor="middle" fontSize="9" fill="rgba(240,244,255,0.5)" fontFamily="system-ui">PP ⑤</text>
     </svg>
   );
 }

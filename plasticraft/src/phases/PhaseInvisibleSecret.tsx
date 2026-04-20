@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { T } from '../components/T';
+import { PETBottle, PPCap, BinCharacter } from '../components/PlasticShapes';
 import type { Tri } from '../data/plastics';
 
 interface Props {
@@ -41,26 +42,37 @@ const SCENE_BODIES: Tri[] = [
   {
     zh: '這就是為什麼瓶身和瓶蓋必須分開！你的眼睛看不出來，但 AI 可以！',
     ja: 'だからボトルとキャップを分ける必要があるんだ！目には見えないけど、AIにはわかる！',
-    en: 'This is WHY bottle and cap must be separated! Your eyes can\'t see it, but AI can!',
+    en: "This is WHY bottle and cap must be separated! Your eyes can't see it, but AI can!",
   },
 ];
 
+const BACK_BTN: Tri = { zh: '← 返回', ja: '← 戻る', en: '← Back' };
 const NEXT_BTN: Tri = { zh: '下一步 →', ja: '次へ →', en: 'Next →' };
 const START_BTN: Tri = { zh: '開始掃描！', ja: 'スキャン開始！', en: 'Start Scanning!' };
+const SCAN_HINT: Tri = {
+  zh: '現在，讓我們看看你從家裡帶來的東西。你的眼睛可能無法分辨，但 AI 可以！',
+  ja: '今、あなたが家から持ってきたものを見てみよう。目では判断できないかもしれないけど、AIにはわかる！',
+  en: "Now, let's take a look at what you brought from home. Your eyes may not be able to tell, but AI can!",
+};
 
 /* ── Scene 0: AI Scan Visual ─────────────────────────────────────────────── */
 function SceneScan() {
   return (
     <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
       <svg viewBox="0 0 120 200" width={120} height={200} aria-hidden="true">
-        {/* Bottle body (PET) */}
-        <rect x="35" y="60" width="50" height="120" rx="14" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="2.5" />
-        <text x="60" y="125" textAnchor="middle" fontSize="10" fontWeight="700" fill="#0277BD">PET ①</text>
-        {/* Bottle cap (PP) */}
-        <rect x="42" y="38" width="36" height="26" rx="8" fill="#FFD54F" stroke="#F9A825" strokeWidth="2.5" />
-        <text x="60" y="56" textAnchor="middle" fontSize="9" fontWeight="700" fill="#E65100">PP ⑤</text>
-        {/* Neck */}
-        <rect x="47" y="56" width="26" height="8" rx="3" fill="#90CAF9" stroke="#4FC3F7" strokeWidth="1.5" />
+        {/* Bottle body (PET) — clear light blue */}
+        <rect x="24" y="6" width="16" height="20" rx="4" fill="rgba(179,229,252,0.9)" stroke="#4FC3F7" strokeWidth="2" />
+        <path d="M 10 26 Q 8 33 8 40 L 56 40 Q 56 33 54 26 Z" fill="rgba(179,229,252,0.85)" stroke="#4FC3F7" strokeWidth="2" />
+        <rect x="8" y="38" width="48" height="62" rx="10" fill="rgba(179,229,252,0.85)" stroke="#4FC3F7" strokeWidth="2.5" />
+        <path d="M 14 44 Q 16 68 14 92" stroke="rgba(255,255,255,0.55)" strokeWidth="3" fill="none" strokeLinecap="round" />
+        <text x="32" y="74" textAnchor="middle" fontSize="10" fontWeight="700" fill="#0277BD">PET ①</text>
+        {/* Cap (PP) — solid green */}
+        <ellipse cx="32" cy="114" rx="22" ry="7" fill="#66BB6A" stroke="#388E3C" strokeWidth="2" />
+        <rect x="10" y="114" width="44" height="16" fill="#4CAF50" />
+        <line x1="10" y1="114" x2="10" y2="130" stroke="#388E3C" strokeWidth="2" />
+        <line x1="54" y1="114" x2="54" y2="130" stroke="#388E3C" strokeWidth="2" />
+        <ellipse cx="32" cy="130" rx="22" ry="7" fill="#43A047" stroke="#388E3C" strokeWidth="2" />
+        <text x="32" y="126" textAnchor="middle" fontSize="9" fontWeight="700" fill="white">PP ⑤</text>
       </svg>
       {/* Animated scan beam */}
       <motion.div
@@ -76,7 +88,6 @@ function SceneScan() {
         animate={{ y: [-80, 80] }}
         transition={{ duration: 1.8, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
       />
-      {/* AI scan label */}
       <div style={{
         position: 'absolute',
         bottom: -28,
@@ -91,69 +102,55 @@ function SceneScan() {
   );
 }
 
-/* ── Scene 1: Characters ─────────────────────────────────────────────────── */
+/* ── Scene 1: Characters with bottle/cap shapes ──────────────────────────── */
 function SceneChars() {
   return (
     <div className="char-pair">
-      {/* PET character */}
+      {/* PET bottle character */}
       <div className="char-block">
         <motion.div
           animate={{ y: [0, -6, 0] }}
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut' }}
         >
-          <svg viewBox="0 0 80 90" width={80} height={90} aria-hidden="true">
-            <circle cx="40" cy="38" r="32" fill="#4FC3F7" stroke="#0288D1" strokeWidth="2.5" />
-            <circle cx="29" cy="32" r="5" fill="white" />
-            <circle cx="51" cy="32" r="5" fill="white" />
-            <circle cx="30" cy="33" r="2.5" fill="#01579B" />
-            <circle cx="52" cy="33" r="2.5" fill="#01579B" />
-            <path d="M 28 48 Q 40 56 52 48" stroke="#01579B" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-            <text x="40" y="80" textAnchor="middle" fontSize="11" fontWeight="800" fill="#0277BD">PET ①</text>
-            <text x="40" y="92" textAnchor="middle" fontSize="9" fill="#4FC3F7">260°C</text>
-          </svg>
+          <PETBottle showFace size={90} />
         </motion.div>
         <div className="char-bubble-mini">
-          {'I\'m PET!\nI melt at\n260°C 🔵'.split('\n').map((l, i) => <div key={i}>{l}</div>)}
+          {"I'm PET!\nI melt at\n260°C 🔵".split('\n').map((l, i) => <div key={i}>{l}</div>)}
         </div>
       </div>
-      {/* PP character */}
+      {/* PP cap character */}
       <div className="char-block">
         <motion.div
           animate={{ y: [0, -6, 0] }}
           transition={{ duration: 2.2, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
         >
-          <svg viewBox="0 0 80 90" width={80} height={90} aria-hidden="true">
-            <circle cx="40" cy="38" r="32" fill="#FFD54F" stroke="#F9A825" strokeWidth="2.5" />
-            <circle cx="29" cy="32" r="5" fill="white" />
-            <circle cx="51" cy="32" r="5" fill="white" />
-            <circle cx="30" cy="33" r="2.5" fill="#E65100" />
-            <circle cx="52" cy="33" r="2.5" fill="#E65100" />
-            <path d="M 28 48 Q 40 56 52 48" stroke="#E65100" strokeWidth="2.5" fill="none" strokeLinecap="round" />
-            <text x="40" y="80" textAnchor="middle" fontSize="11" fontWeight="800" fill="#E65100">PP ⑤</text>
-            <text x="40" y="92" textAnchor="middle" fontSize="9" fill="#F9A825">160°C</text>
-          </svg>
+          <PPCap showFace size={80} />
         </motion.div>
         <div className="char-bubble-mini">
-          {'I\'m PP!\nI melt at\n160°C 🟡'.split('\n').map((l, i) => <div key={i}>{l}</div>)}
+          {"I'm PP!\nI melt at\n160°C 🟢".split('\n').map((l, i) => <div key={i}>{l}</div>)}
         </div>
       </div>
     </div>
   );
 }
 
-/* ── Scene 2: Temperature Bar ─────────────────────────────────────────────── */
+/* ── Scene 2: Temperature Bar with bottle + cap visuals ─────────────────── */
 function SceneTempBar() {
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%' }}>
-      {/* Bottle icon */}
-      <svg viewBox="0 0 120 60" width={120} height={60} aria-hidden="true">
-        <rect x="20" y="20" width="32" height="32" rx="6" fill="#B3E5FC" stroke="#4FC3F7" strokeWidth="1.5" />
-        <text x="36" y="40" textAnchor="middle" fontSize="8" fill="#0277BD" fontWeight="700">PET</text>
-        <rect x="68" y="20" width="32" height="32" rx="6" fill="#FFD54F" stroke="#F9A825" strokeWidth="1.5" />
-        <text x="84" y="40" textAnchor="middle" fontSize="8" fill="#E65100" fontWeight="700">PP</text>
-        <text x="60" y="42" textAnchor="middle" fontSize="16" fill="#aaa">+</text>
-        <text x="60" y="14" textAnchor="middle" fontSize="9" fill="var(--text-dim)">→ factory furnace</text>
-      </svg>
+      {/* PET bottle + PP cap going into furnace */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, justifyContent: 'center' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <PETBottle size={70} />
+          <span style={{ fontSize: '0.72rem', color: '#4FC3F7', fontWeight: 700 }}>PET</span>
+        </div>
+        <span style={{ fontSize: '1.4rem', color: 'var(--text-dim)', paddingBottom: 12 }}>+</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
+          <PPCap size={55} />
+          <span style={{ fontSize: '0.72rem', color: '#66BB6A', fontWeight: 700 }}>PP</span>
+        </div>
+        <span style={{ fontSize: '1.2rem', color: 'var(--text-dim)', paddingBottom: 12 }}>→ 🔥</span>
+      </div>
 
       {/* Temperature bar */}
       <div style={{ width: '100%', maxWidth: 360 }}>
@@ -172,14 +169,14 @@ function SceneTempBar() {
         </div>
         <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: '0.78rem' }}>
           <span />
-          <span style={{ color: '#FFD54F' }}>← PP cap is inside too</span>
+          <span style={{ color: '#66BB6A' }}>← PP cap is inside too</span>
         </div>
       </div>
     </div>
   );
 }
 
-/* ── Scene 3: Contamination ───────────────────────────────────────────────── */
+/* ── Scene 3: Contamination with melting PP cap + sad PET bottle ─────────── */
 function SceneContaminate() {
   const [contaminated, setContaminated] = useState(false);
   const [shaking, setShaking] = useState(false);
@@ -192,35 +189,52 @@ function SceneContaminate() {
   };
 
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16 }}>
-      <div style={{ fontSize: '0.85rem', color: 'var(--text-dim)', textAlign: 'center' }}>
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+      <div style={{ fontSize: '0.85rem', color: '#FF5252', textAlign: 'center', fontWeight: 700 }}>
         🌡️ Temperature reaches 160°C…
       </div>
-      <motion.div
-        animate={shaking ? { x: [-8, 8, -6, 6, 0] } : { x: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <div className="batch-container">
-          {/* PET batch background */}
-          <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <span style={{ fontSize: '0.85rem', fontWeight: 700, color: '#4FC3F7' }}>PET Batch</span>
-          </div>
-          {/* Contamination overlay */}
-          <motion.div
-            style={{
-              position: 'absolute', top: 0, left: 0, height: '100%',
-              background: 'rgba(239,83,80,0.7)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}
-            initial={{ width: '0%' }}
-            animate={{ width: contaminated ? '100%' : '100%' }}
-            onAnimationComplete={!contaminated ? handleContamComplete : undefined}
-            transition={{ duration: 2, ease: 'easeIn' }}
-          >
-            {contaminated && <span style={{ fontSize: '0.75rem', fontWeight: 800, color: 'white' }}>PP contaminated!</span>}
-          </motion.div>
+
+      {/* PP melting + PET sad */}
+      <div style={{ display: 'flex', alignItems: 'flex-end', gap: 24, justifyContent: 'center' }}>
+        <motion.div
+          animate={shaking ? { x: [-8, 8, -6, 6, 0] } : { x: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
+        >
+          <PPCap melting size={65} />
+          <span style={{ fontSize: '0.7rem', color: '#66BB6A', fontWeight: 700 }}>PP melting! 💧</span>
+        </motion.div>
+
+        <motion.div
+          animate={shaking ? { x: [-8, 8, -6, 6, 0] } : { x: 0 }}
+          transition={{ duration: 0.5 }}
+          style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}
+        >
+          <PETBottle sad showFace size={80} />
+          <span style={{ fontSize: '0.7rem', color: '#4FC3F7', fontWeight: 700 }}>PET contaminated!</span>
+        </motion.div>
+      </div>
+
+      {/* Batch contamination bar */}
+      <div style={{ position: 'relative', width: 200, height: 36, overflow: 'hidden', borderRadius: 10, border: '2px solid #4FC3F7', background: 'rgba(79,195,247,0.1)' }}>
+        <div style={{ position: 'absolute', inset: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+          <span style={{ fontSize: '0.8rem', fontWeight: 700, color: '#4FC3F7' }}>PET Batch</span>
         </div>
-      </motion.div>
+        <motion.div
+          style={{
+            position: 'absolute', top: 0, left: 0, height: '100%',
+            background: 'rgba(239,83,80,0.7)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+          }}
+          initial={{ width: '0%' }}
+          animate={{ width: '100%' }}
+          onAnimationComplete={!contaminated ? handleContamComplete : undefined}
+          transition={{ duration: 2, ease: 'easeIn' }}
+        >
+          {contaminated && <span style={{ fontSize: '0.72rem', fontWeight: 800, color: 'white' }}>PP contaminated!</span>}
+        </motion.div>
+      </div>
+
       <AnimatePresence>
         {failed && (
           <motion.p
@@ -236,7 +250,7 @@ function SceneContaminate() {
   );
 }
 
-/* ── Scene 4: Resolution — separate bins ─────────────────────────────────── */
+/* ── Scene 4: Resolution — separate bins with characters ─────────────────── */
 function SceneResolve() {
   return (
     <div className="bin-pair">
@@ -247,9 +261,9 @@ function SceneResolve() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0 }}
       >
-        <div style={{ fontSize: '2rem' }}>🔵</div>
-        <div style={{ fontSize: '0.95rem', color: '#4FC3F7' }}>PET ①</div>
-        <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Bottle body</div>
+        <BinCharacter type="blue" size={70} />
+        <div style={{ fontSize: '0.95rem', color: '#4FC3F7', fontWeight: 700 }}>PET ①</div>
+        <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>Bottle body</div>
         <div className="bin-card__check">✓</div>
       </motion.div>
       <motion.div
@@ -259,9 +273,9 @@ function SceneResolve() {
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
       >
-        <div style={{ fontSize: '2rem' }}>🟢</div>
-        <div style={{ fontSize: '0.95rem', color: '#81C784' }}>PP ⑤</div>
-        <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)' }}>Bottle cap</div>
+        <BinCharacter type="green" size={70} />
+        <div style={{ fontSize: '0.95rem', color: '#81C784', fontWeight: 700 }}>PP ⑤</div>
+        <div style={{ fontSize: '0.78rem', color: 'var(--text-dim)' }}>Bottle cap</div>
         <div className="bin-card__check">✓</div>
       </motion.div>
     </div>
@@ -275,11 +289,12 @@ export function PhaseInvisibleSecret({ onNext }: Props) {
   const [scene, setScene] = useState(0);
 
   const advance = () => {
-    if (scene < 4) {
-      setScene(s => s + 1);
-    } else {
-      onNext();
-    }
+    if (scene < 4) setScene(s => s + 1);
+    else onNext();
+  };
+
+  const goBack = () => {
+    if (scene > 0) setScene(s => s - 1);
   };
 
   const Visual = SCENE_VISUALS[scene];
@@ -316,9 +331,28 @@ export function PhaseInvisibleSecret({ onNext }: Props) {
         ))}
       </div>
 
-      <button className="btn-primary" onClick={advance}>
-        <T s={scene < 4 ? NEXT_BTN : START_BTN} />
-      </button>
+      {/* Scan hint before Start Scanning button */}
+      {scene === 4 && (
+        <motion.p
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.6 }}
+          style={{ fontSize: '0.9rem', color: 'var(--primary)', textAlign: 'center', margin: 0, fontWeight: 600, maxWidth: 380 }}
+        >
+          <T s={SCAN_HINT} />
+        </motion.p>
+      )}
+
+      <div style={{ display: 'flex', gap: 12 }}>
+        {scene > 0 && (
+          <button className="btn-secondary" onClick={goBack}>
+            <T s={BACK_BTN} />
+          </button>
+        )}
+        <button className="btn-primary" onClick={advance}>
+          <T s={scene < 4 ? NEXT_BTN : START_BTN} />
+        </button>
+      </div>
     </div>
   );
 }
