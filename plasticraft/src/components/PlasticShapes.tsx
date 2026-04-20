@@ -52,11 +52,13 @@ export function PPCap({
   showFace = false,
   sad = false,
   melting = false,
+  meltProgress = 1,
 }: {
   size?: number;
   showFace?: boolean;
   sad?: boolean;
   melting?: boolean;
+  meltProgress?: number;
 }) {
   const viewH = melting ? 80 : 58;
   return (
@@ -92,16 +94,16 @@ export function PPCap({
           <text x="40" y="47" textAnchor="middle" fontSize="8" fontWeight="800" fill="white" opacity="0.85">PP ⑤</text>
         </>
       )}
-      {/* Melting drips */}
+      {/* Melting drips — opacity driven by meltProgress for gradual reveal */}
       {melting && (
-        <>
+        <g style={{ opacity: meltProgress, transition: 'opacity 1.3s ease-in' }}>
           <path d="M 14 46 Q 11 60 9 70" stroke="#66BB6A" strokeWidth="5" fill="none" strokeLinecap="round" />
           <ellipse cx="9" cy="71" rx="5" ry="3" fill="#66BB6A" />
           <path d="M 35 46 Q 33 58 32 68" stroke="#66BB6A" strokeWidth="5" fill="none" strokeLinecap="round" />
           <ellipse cx="32" cy="69" rx="5" ry="3" fill="#66BB6A" />
           <path d="M 62 46 Q 65 59 67 70" stroke="#66BB6A" strokeWidth="5" fill="none" strokeLinecap="round" />
           <ellipse cx="67" cy="71" rx="5" ry="3" fill="#66BB6A" />
-        </>
+        </g>
       )}
     </svg>
   );

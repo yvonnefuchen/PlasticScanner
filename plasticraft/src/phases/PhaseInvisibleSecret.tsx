@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { T } from '../components/T';
 import { PETBottle, PPCap, BinCharacter } from '../components/PlasticShapes';
@@ -214,22 +214,58 @@ function SceneChars() {
   );
 }
 
-/* ── Scene 2: Temperature Bar with bottle + cap visuals ─────────────────── */
+/* ── Scene 2: Temperature Bar — PP melts at 160°C, PET distressed at 260°C ── */
 function SceneTempBar() {
+  const [meltProgress, setMeltProgress] = useState(0);
+  const [petDistressed, setPetDistressed] = useState(false);
+  const [meltWarning, setMeltWarning] = useState(false);
+
+  useEffect(() => {
+    // 61.5% of 3 s ≈ 1 845 ms → PP starts melting
+    const t1 = setTimeout(() => { setMeltProgress(1); setMeltWarning(true); }, 1850);
+    // end of bar ≈ 3 100 ms → PET distressed
+    const t2 = setTimeout(() => setPetDistressed(true), 3150);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, []);
+
   return (
-    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, width: '100%' }}>
-      {/* PET bottle + PP cap going into furnace */}
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 16, width: '100%' }}>
+
+      {/* Characters above the bar */}
       <div style={{ display: 'flex', alignItems: 'flex-end', gap: 20, justifyContent: 'center' }}>
+
+        {/* PET bottle — normal → sad shake when temp hits 260°C */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <PETBottle size={70} />
-          <span style={{ fontSize: '0.72rem', color: '#4FC3F7', fontWeight: 700 }}>PET</span>
+          <AnimatePresence mode="wait">
+            {petDistressed ? (
+              <motion.div key="pet-sad"
+                initial={{ opacity: 0 }} animate={{ opacity: 1, x: [0, -5, 5, -4, 4, -2, 0] }}
+                transition={{ opacity: { duration: 0.2 }, x: { duration: 0.55, ease: 'easeInOut' } }}
+              >
+                <PETBottle showFace sad size={70} />
+              </motion.div>
+            ) : (
+              <motion.div key="pet-normal" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
+                <PETBottle size={70} />
+              </motion.div>
+            )}
+          </AnimatePresence>
+          <span style={{ fontSize: '0.72rem', color: petDistressed ? '#FF5252' : '#4FC3F7', fontWeight: 700, transition: 'color 0.4s' }}>
+            {petDistressed ? '😱 PET contaminated!' : 'PET 260°C'}
+          </span>
         </div>
-        <span style={{ fontSize: '1.4rem', color: 'var(--text-dim)', paddingBottom: 12 }}>+</span>
+
+        <span style={{ fontSize: '1.3rem', color: 'var(--text-dim)', paddingBottom: 22 }}>+</span>
+
+        {/* PP cap — always melting=true; meltProgress drives drip opacity */}
         <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 4 }}>
-          <PPCap size={55} />
-          <span style={{ fontSize: '0.72rem', color: '#66BB6A', fontWeight: 700 }}>PP</span>
+          <PPCap melting meltProgress={meltProgress} size={58} />
+          <span style={{ fontSize: '0.72rem', color: meltWarning ? '#FF5252' : '#66BB6A', fontWeight: 700, transition: 'color 0.4s' }}>
+            {meltWarning ? '🔥 PP melting!' : 'PP 160°C'}
+          </span>
         </div>
-        <span style={{ fontSize: '1.2rem', color: 'var(--text-dim)', paddingBottom: 12 }}>→ 🔥</span>
+
+        <span style={{ fontSize: '1.2rem', color: 'var(--text-dim)', paddingBottom: 22 }}>→ 🔥</span>
       </div>
 
       {/* Temperature bar */}
@@ -247,9 +283,14 @@ function SceneTempBar() {
           />
           <div className="temp-bar-marker" />
         </div>
-        <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 6, fontSize: '0.78rem' }}>
-          <span />
-          <span style={{ color: '#66BB6A' }}>← PP cap is inside too</span>
+        <div style={{ display: 'flex', justifyContent: 'flex-end', marginTop: 6, fontSize: '0.78rem' }}>
+          <motion.span
+            animate={{ color: meltWarning ? '#FF5252' : '#66BB6A' }}
+            transition={{ duration: 0.4 }}
+            style={{ fontWeight: 700 }}
+          >
+            {meltWarning ? '⚠ PP already melted here!' : '← PP cap is in here too'}
+          </motion.span>
         </div>
       </div>
     </div>

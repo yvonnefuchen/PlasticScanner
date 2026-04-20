@@ -27,7 +27,7 @@ const MC_VALS: McChoice[] = ['A', 'B', 'C', 'D'];
 const TITLE: Tri = { zh: '開始前，幾個小問題！', ja: '始める前に、ちょっとした質問！', en: 'A Few Quick Questions First!' };
 const BUBBLE: Tri = { zh: '餵我之前，先讓我了解你一下！', ja: '食べさせる前に、少し教えて！', en: 'Before you feed me, tell me a little about yourself!' };
 const SUBMIT: Tri = { zh: '送出，開始掃描！', ja: '送信してスキャン開始！', en: 'Submit & Start Scanning!' };
-const AI_PREVIEW: Tri = { zh: '掃描前，先讓我展示一下我能做什麼！', ja: 'スキャン前に、僕の能力を見せてあげる！', en: 'Before scanning, let me give you an idea of what I am capable of!' };
+const AI_PREVIEW: Tri = { zh: '掃描前，先讓我展示一下我的能力！', ja: 'スキャン前に、僕の能力を見てみよう！', en: "Before scanning, let's see what I am capable of!" };
 
 const Q1: Tri = { zh: '1. 丟棄塑膠瓶時，瓶蓋應該怎麼處理？', ja: '1. プラスチックボトルを捨てるとき、キャップはどうする？', en: '1. When you throw away a plastic bottle, what should you do with the cap?' };
 const Q1_OPTS: Tri[] = [
@@ -130,7 +130,7 @@ export function PhaseSurveyPre({ onComplete }: Props) {
       q7_open: answers.q7.trim(),
     });
     setSubmitted(true);
-    setTimeout(() => onComplete(id), 1800);
+    setTimeout(() => onComplete(id), 3800);
   };
 
   const set = <K extends keyof PreAnswers>(k: K, v: PreAnswers[K]) =>
@@ -141,31 +141,32 @@ export function PhaseSurveyPre({ onComplete }: Props) {
       <AnimatePresence mode="wait">
         {submitted ? (
           <motion.div key="thanks" className="survey-thanks" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-            {/* AI scan preview animation */}
-            <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center', marginBottom: 8 }}>
-              <svg viewBox="0 0 120 200" width={90} height={150} aria-hidden="true">
-                <rect x="24" y="6" width="16" height="20" rx="4" fill="rgba(179,229,252,0.9)" stroke="#4FC3F7" strokeWidth="2" />
-                <path d="M 10 26 Q 8 33 8 40 L 56 40 Q 56 33 54 26 Z" fill="rgba(179,229,252,0.85)" stroke="#4FC3F7" strokeWidth="2" />
-                <rect x="8" y="38" width="48" height="62" rx="10" fill="rgba(179,229,252,0.85)" stroke="#4FC3F7" strokeWidth="2.5" />
-                <path d="M 14 44 Q 16 68 14 92" stroke="rgba(255,255,255,0.55)" strokeWidth="3" fill="none" strokeLinecap="round" />
-                <text x="32" y="74" textAnchor="middle" fontSize="10" fontWeight="700" fill="#0277BD">PET ①</text>
-                <ellipse cx="32" cy="114" rx="22" ry="7" fill="#66BB6A" stroke="#388E3C" strokeWidth="2" />
-                <rect x="10" y="114" width="44" height="16" fill="#4CAF50" />
-                <line x1="10" y1="114" x2="10" y2="130" stroke="#388E3C" strokeWidth="2" />
-                <line x1="54" y1="114" x2="54" y2="130" stroke="#388E3C" strokeWidth="2" />
-                <ellipse cx="32" cy="130" rx="22" ry="7" fill="#43A047" stroke="#388E3C" strokeWidth="2" />
-                <text x="32" y="126" textAnchor="middle" fontSize="9" fontWeight="700" fill="white">PP ⑤</text>
-              </svg>
-              <motion.div
-                style={{
-                  position: 'absolute', left: 0, right: 0, height: 3,
-                  background: 'linear-gradient(to right, transparent, #6ee7f7, transparent)',
-                  borderRadius: 2, boxShadow: '0 0 8px #6ee7f7',
-                }}
-                animate={{ y: [-60, 60] }}
-                transition={{ duration: 1.6, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
-              />
-              <div style={{ position: 'absolute', bottom: -18, fontSize: '0.68rem', color: '#6ee7f7', fontWeight: 700, letterSpacing: '0.06em' }}>◈ AI SCAN</div>
+            {/* Bouncing equalizer bars — AI visualizer */}
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginBottom: 4 }}>
+              <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 72 }}>
+                {([
+                  { delay: 0,    heights: [14, 58] as [number, number] },
+                  { delay: 0.13, heights: [28, 50] as [number, number] },
+                  { delay: 0.27, heights: [8,  66] as [number, number] },
+                  { delay: 0.06, heights: [22, 54] as [number, number] },
+                  { delay: 0.19, heights: [18, 62] as [number, number] },
+                  { delay: 0.34, heights: [12, 48] as [number, number] },
+                  { delay: 0.08, heights: [24, 56] as [number, number] },
+                ]).map((b, i) => (
+                  <motion.div
+                    key={i}
+                    style={{
+                      width: 13,
+                      borderRadius: 4,
+                      background: `linear-gradient(to top, #6ee7f7, #6ef7a0)`,
+                      originY: 1,
+                    }}
+                    animate={{ height: [b.heights[0], b.heights[1], b.heights[0]] }}
+                    transition={{ duration: 0.72 + i * 0.04, repeat: Infinity, delay: b.delay, ease: 'easeInOut' }}
+                  />
+                ))}
+              </div>
+              <div style={{ fontSize: '0.7rem', color: '#6ee7f7', fontWeight: 700, letterSpacing: '0.06em' }}>◈ AI ANALYSING…</div>
             </div>
             <p className="survey-thanks__text"><T s={AI_PREVIEW} /></p>
           </motion.div>
