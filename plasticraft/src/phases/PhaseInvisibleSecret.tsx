@@ -55,49 +55,129 @@ const SCAN_HINT: Tri = {
   en: "Now, let's take a look at what you brought from home. Your eyes may not be able to tell, but AI can!",
 };
 
-/* ── Scene 0: AI Scan Visual ─────────────────────────────────────────────── */
+/* ── Scene 0: AI X-ray Scan — cap on bottle, reveal two materials ─────────── */
 function SceneScan() {
+  const [scanned, setScanned] = useState(false);
+
+  /* animate from grey → material colour */
+  const cap = {
+    top:    scanned ? '#66BB6A' : '#b8b8b8',
+    side:   scanned ? '#4CAF50' : '#a8a8a8',
+    bot:    scanned ? '#43A047' : '#999999',
+    stroke: scanned ? '#388E3C' : '#777777',
+  };
+  const pet = {
+    fill:   scanned ? 'rgba(179,229,252,0.88)' : 'rgba(170,170,170,0.45)',
+    stroke: scanned ? '#4FC3F7'                : '#888888',
+  };
+  const t = { duration: 0.65 };
+
   return (
-    <div style={{ position: 'relative', display: 'inline-flex', alignItems: 'center', justifyContent: 'center' }}>
-      <svg viewBox="0 0 120 200" width={120} height={200} aria-hidden="true">
-        {/* Bottle body (PET) — clear light blue */}
-        <rect x="24" y="6" width="16" height="20" rx="4" fill="rgba(179,229,252,0.9)" stroke="#4FC3F7" strokeWidth="2" />
-        <path d="M 10 26 Q 8 33 8 40 L 56 40 Q 56 33 54 26 Z" fill="rgba(179,229,252,0.85)" stroke="#4FC3F7" strokeWidth="2" />
-        <rect x="8" y="38" width="48" height="62" rx="10" fill="rgba(179,229,252,0.85)" stroke="#4FC3F7" strokeWidth="2.5" />
-        <path d="M 14 44 Q 16 68 14 92" stroke="rgba(255,255,255,0.55)" strokeWidth="3" fill="none" strokeLinecap="round" />
-        <text x="32" y="74" textAnchor="middle" fontSize="10" fontWeight="700" fill="#0277BD">PET ①</text>
-        {/* Cap (PP) — solid green */}
-        <ellipse cx="32" cy="114" rx="22" ry="7" fill="#66BB6A" stroke="#388E3C" strokeWidth="2" />
-        <rect x="10" y="114" width="44" height="16" fill="#4CAF50" />
-        <line x1="10" y1="114" x2="10" y2="130" stroke="#388E3C" strokeWidth="2" />
-        <line x1="54" y1="114" x2="54" y2="130" stroke="#388E3C" strokeWidth="2" />
-        <ellipse cx="32" cy="130" rx="22" ry="7" fill="#43A047" stroke="#388E3C" strokeWidth="2" />
-        <text x="32" y="126" textAnchor="middle" fontSize="9" fontWeight="700" fill="white">PP ⑤</text>
-      </svg>
-      {/* Animated scan beam */}
-      <motion.div
-        style={{
-          position: 'absolute',
-          left: 0,
-          right: 0,
-          height: 3,
-          background: 'linear-gradient(to right, transparent, #6ee7f7, transparent)',
-          borderRadius: 2,
-          boxShadow: '0 0 8px #6ee7f7',
-        }}
-        animate={{ y: [-80, 80] }}
-        transition={{ duration: 1.8, repeat: Infinity, repeatType: 'reverse', ease: 'easeInOut' }}
-      />
-      <div style={{
-        position: 'absolute',
-        bottom: -28,
-        fontSize: '0.75rem',
-        color: '#6ee7f7',
-        fontWeight: 700,
-        letterSpacing: '0.05em',
-      }}>
-        ◈ AI SCAN
+    <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+      {/* X-ray frame */}
+      <div style={{ position: 'relative', width: 280, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+
+        {/* Bottle + cap as one object */}
+        <svg viewBox="0 0 100 148" width={110} height={163} aria-hidden="true">
+          {/* PP Cap */}
+          <motion.ellipse cx="50" cy="10" rx="24" ry="8"
+            animate={{ fill: cap.top, stroke: cap.stroke }} transition={t} strokeWidth="2" />
+          <motion.rect x="26" y="10" width="48" height="18"
+            animate={{ fill: cap.side }} transition={t} />
+          <motion.line x1="26" y1="10" x2="26" y2="28"
+            animate={{ stroke: cap.stroke }} transition={t} strokeWidth="2" />
+          <motion.line x1="74" y1="10" x2="74" y2="28"
+            animate={{ stroke: cap.stroke }} transition={t} strokeWidth="2" />
+          <motion.ellipse cx="50" cy="28" rx="24" ry="8"
+            animate={{ fill: cap.bot, stroke: cap.stroke }} transition={t} strokeWidth="2" />
+
+          {/* PET Neck */}
+          <motion.rect x="38" y="26" width="24" height="14" rx="3"
+            animate={{ fill: pet.fill, stroke: pet.stroke }} transition={t} strokeWidth="1.5" />
+
+          {/* PET Shoulder */}
+          <motion.path d="M 14 41 Q 12 49 12 55 L 88 55 Q 88 49 86 41 Z"
+            animate={{ fill: pet.fill, stroke: pet.stroke }} transition={t} strokeWidth="1.5" />
+
+          {/* PET Body */}
+          <motion.rect x="12" y="53" width="76" height="88" rx="12"
+            animate={{ fill: pet.fill, stroke: pet.stroke }} transition={t} strokeWidth="2.5" />
+
+          {/* Highlight line (PET only, after reveal) */}
+          {scanned && (
+            <motion.path d="M 19 60 Q 21 92 19 132"
+              stroke="rgba(255,255,255,0.5)" strokeWidth="3" fill="none" strokeLinecap="round"
+              initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.4 }} />
+          )}
+        </svg>
+
+        {/* PP label — top right */}
+        <AnimatePresence>
+          {scanned && (
+            <motion.div
+              initial={{ opacity: 0, x: 14 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35 }}
+              style={{
+                position: 'absolute', right: 4, top: 16,
+                background: 'rgba(76,175,80,0.18)', border: '1.5px solid #66BB6A',
+                borderRadius: 8, padding: '5px 10px', textAlign: 'center',
+              }}
+            >
+              <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#66BB6A' }}>PP ⑤</div>
+              <div style={{ fontSize: '0.7rem', color: '#A5D6A7' }}>melt 160°C</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* PET label — bottom left */}
+        <AnimatePresence>
+          {scanned && (
+            <motion.div
+              initial={{ opacity: 0, x: -14 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.35, delay: 0.18 }}
+              style={{
+                position: 'absolute', left: 4, top: 102,
+                background: 'rgba(79,195,247,0.18)', border: '1.5px solid #4FC3F7',
+                borderRadius: 8, padding: '5px 10px', textAlign: 'center',
+              }}
+            >
+              <div style={{ fontSize: '0.82rem', fontWeight: 800, color: '#4FC3F7' }}>PET ①</div>
+              <div style={{ fontSize: '0.7rem', color: '#81D4FA' }}>melt 260°C</div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Scan beam (sweeps twice, then stops) */}
+        {!scanned && (
+          <>
+            <motion.div
+              style={{
+                position: 'absolute', left: 0, right: 0, height: 3,
+                background: 'linear-gradient(to right, transparent, #6ee7f7, transparent)',
+                borderRadius: 2, boxShadow: '0 0 10px 3px rgba(110,231,247,0.7)',
+              }}
+              animate={{ y: [-82, 82] }}
+              transition={{ duration: 1.8, repeat: 1, repeatType: 'loop', ease: 'easeInOut' }}
+              onAnimationComplete={() => setScanned(true)}
+            />
+            <motion.div
+              style={{
+                position: 'absolute', left: 0, right: 0, height: 50, pointerEvents: 'none',
+                background: 'radial-gradient(ellipse at 50% 50%, rgba(110,231,247,0.10) 0%, transparent 70%)',
+              }}
+              animate={{ y: [-82, 82] }}
+              transition={{ duration: 1.8, repeat: 1, repeatType: 'loop', ease: 'easeInOut' }}
+            />
+          </>
+        )}
       </div>
+
+      {/* Status bar */}
+      <motion.div
+        animate={{ color: scanned ? '#6ef7a0' : '#6ee7f7' }}
+        transition={{ duration: 0.5 }}
+        style={{ fontSize: '0.75rem', fontWeight: 700, letterSpacing: '0.06em', textAlign: 'center' }}
+      >
+        {scanned ? '◈ SCAN COMPLETE — 2 MATERIALS DETECTED' : '◈ AI SCANNING…'}
+      </motion.div>
     </div>
   );
 }
