@@ -16,7 +16,7 @@ import { PhaseSurveyPre } from './phases/PhaseSurveyPre';
 import { PhaseSurveyPost } from './phases/PhaseSurveyPost';
 
 import { PLASTICS, DEMO_PLASTIC, type PlasticId } from './data/plastics';
-import { identifyPlastic, type ScanData } from './services/scanner';
+import { identifyPlastic, DEMO_SCAN_DATA, type ScanData } from './services/scanner';
 
 type AppPhase =
   | 'idle'
@@ -38,6 +38,7 @@ function AppInner() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [identifiedId, setIdentifiedId] = useState<PlasticId>(DEMO_PLASTIC);
   const [scanData, setScanData] = useState<ScanData | null>(null);
+  const [scanError, setScanError] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const scannerRef = useRef<ScannerHandle>(null);
@@ -68,9 +69,11 @@ function AppInner() {
       const result = await identifyPlastic(dataUrl);
       setIdentifiedId(result.plasticId);
       setScanData(result.scanData ?? null);
-    } catch {
+      setScanError(null);
+    } catch (e) {
       setIdentifiedId(DEMO_PLASTIC);
-      setScanData(null);
+      setScanData(DEMO_SCAN_DATA);
+      setScanError(e instanceof Error ? e.message : String(e));
     }
     setPhase('identified');
   }, []);
@@ -143,7 +146,9 @@ function AppInner() {
             <PhaseIdentified
               plastic={plastic}
               scanData={scanData}
+              scanError={scanError}
               onNext={() => setPhase('quiz')}
+              onRetry={() => setPhase('scanning')}
               onOverride={(id) => { setIdentifiedId(id); setPhase('quiz'); }}
             />
           </PageWrap>

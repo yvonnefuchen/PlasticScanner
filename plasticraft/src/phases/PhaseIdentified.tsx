@@ -10,7 +10,9 @@ import type { ScanData } from '../services/scanner';
 interface Props {
   plastic: PlasticType;
   scanData?: ScanData | null;
+  scanError?: string | null;
   onNext: () => void;
+  onRetry?: () => void;
   onOverride?: (id: PlasticId) => void;
 }
 
@@ -18,8 +20,11 @@ const TAP_CONTINUE = { zh: '繼續', ja: '続ける', en: 'Continue' };
 const CANT_FIND    = { zh: '找不到，繼續吧', ja: 'わからない、続ける', en: "Can't find it — continue" };
 const FOUND_LABEL  = { zh: '我看到這個！', ja: 'これを見つけたよ！', en: 'I can see it printed!' };
 const FLIP_TIP     = { zh: '翻到底部或側面找找看 👀', ja: '底か横を見てみよう 👀', en: 'Flip it over and look at the bottom or side 👀' };
-const RESHAPE_TITLE = { zh: '用它可以做成這些東西：', ja: 'これに生まれ変われるよ：', en: 'This can be reshaped into:' };
-const MELT_LABEL   = { zh: '融點', ja: '融点', en: 'Melting point' };
+const RESHAPE_TITLE  = { zh: '用它可以做成這些東西：', ja: 'これに生まれ変われるよ：', en: 'This can be reshaped into:' };
+const MELT_LABEL     = { zh: '融點', ja: '融点', en: 'Melting point' };
+const RETRY_LABEL    = { zh: '重新拍照試試', ja: 'もう一度撮ってみよう', en: 'Try capturing again' };
+const SCAN_FAIL_MSG  = { zh: '掃描失敗了，請再試一次！', ja: 'スキャンに失敗しました。もう一度試してね！', en: 'Scan failed — please try again!' };
+const AI_REASONING   = { zh: 'AI 判斷依據', ja: 'AI の判断根拠', en: 'AI reasoning' };
 
 /* The 3 workshop materials a child might confirm from the printed label */
 const LABEL_OPTIONS: Array<{ id: PlasticId; code: string; color: string }> = [
@@ -28,7 +33,7 @@ const LABEL_OPTIONS: Array<{ id: PlasticId; code: string; color: string }> = [
   { id: 'PS',  code: 'PS',  color: '#FFAB40' },
 ];
 
-export function PhaseIdentified({ plastic, scanData, onNext, onOverride }: Props) {
+export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry, onOverride }: Props) {
   const { lang } = useLang();
   const [showContinue, setShowContinue]         = useState(false);
   const [showUncertainty, setShowUncertainty]   = useState(false);
@@ -83,6 +88,40 @@ export function PhaseIdentified({ plastic, scanData, onNext, onOverride }: Props
 
   return (
     <div className="phase-container" style={{ '--accent': plastic.color } as React.CSSProperties}>
+      {/* ── Scan error banner ── */}
+      {scanError && (
+        <motion.div
+          initial={{ opacity: 0, y: -8 }}
+          animate={{ opacity: 1, y: 0 }}
+          style={{
+            width: '100%', maxWidth: 480,
+            background: 'rgba(239,83,80,0.12)',
+            border: '1.5px solid #EF5350',
+            borderRadius: 12,
+            padding: '10px 14px',
+            fontSize: '0.82rem',
+            color: 'var(--text)',
+            lineHeight: 1.5,
+          }}
+        >
+          <div style={{ fontWeight: 700, color: '#EF5350', marginBottom: 6 }}>
+            ⚠️ <T s={SCAN_FAIL_MSG} />
+          </div>
+          <div style={{ fontFamily: 'monospace', fontSize: '0.74rem', color: 'var(--text-dim)', marginBottom: 8, wordBreak: 'break-all' }}>
+            {scanError}
+          </div>
+          {onRetry && (
+            <button
+              className="btn-secondary"
+              style={{ fontSize: '0.82rem' }}
+              onClick={onRetry}
+            >
+              📷 <T s={RETRY_LABEL} />
+            </button>
+          )}
+        </motion.div>
+      )}
+
       <PlasticMascot
         state="talking"
         color={plastic.color}
@@ -118,6 +157,23 @@ export function PhaseIdentified({ plastic, scanData, onNext, onOverride }: Props
           {obj.melting_point_celsius && (
             <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: 4 }}>
               🌡️ <T s={MELT_LABEL} /> {obj.melting_point_celsius}°C
+            </div>
+          )}
+          {obj.reasoning && (
+            <div style={{
+              marginTop: 6,
+              display: 'inline-block',
+              background: 'rgba(110,231,247,0.08)',
+              border: '1px solid rgba(110,231,247,0.25)',
+              borderRadius: 8,
+              padding: '5px 10px',
+              fontSize: '0.72rem',
+              color: 'var(--text-dim)',
+              fontStyle: 'italic',
+              maxWidth: 440,
+              lineHeight: 1.4,
+            }}>
+              🔍 <strong style={{ fontStyle: 'normal' }}><T s={AI_REASONING} />:</strong> {obj.reasoning}
             </div>
           )}
         </motion.div>
