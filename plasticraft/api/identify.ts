@@ -4,7 +4,7 @@
 /* process.env is available in Vercel edge runtime but not in browser TS types */
 declare const process: { env: Record<string, string | undefined> };
 
-export const config = { runtime: 'edge' };
+export const config = { maxDuration: 60 };
 
 type PlasticId = 'PET' | 'HDPE' | 'PP' | 'PS' | 'PVC';
 const VALID_IDS: PlasticId[] = ['PET', 'HDPE', 'PP', 'PS', 'PVC'];
@@ -173,6 +173,7 @@ export default async function handler(req: Request): Promise<Response> {
         responseMimeType: 'application/json',
         temperature: 0.2,
         maxOutputTokens: 2048,
+        thinkingConfig: { thinkingBudget: 0 },
       },
     }),
   });
