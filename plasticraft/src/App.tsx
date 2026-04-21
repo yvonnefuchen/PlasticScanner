@@ -16,7 +16,7 @@ import { PhaseSurveyPre } from './phases/PhaseSurveyPre';
 import { PhaseSurveyPost } from './phases/PhaseSurveyPost';
 
 import { PLASTICS, DEMO_PLASTIC, type PlasticId } from './data/plastics';
-import { identifyPlastic } from './services/scanner';
+import { identifyPlastic, type ScanData } from './services/scanner';
 
 type AppPhase =
   | 'idle'
@@ -37,6 +37,7 @@ function AppInner() {
   const [phase, setPhase] = useState<AppPhase>('idle');
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [identifiedId, setIdentifiedId] = useState<PlasticId>(DEMO_PLASTIC);
+  const [scanData, setScanData] = useState<ScanData | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const scannerRef = useRef<ScannerHandle>(null);
@@ -66,8 +67,10 @@ function AppInner() {
     try {
       const result = await identifyPlastic(dataUrl);
       setIdentifiedId(result.plasticId);
+      setScanData(result.scanData ?? null);
     } catch {
       setIdentifiedId(DEMO_PLASTIC);
+      setScanData(null);
     }
     setPhase('identified');
   }, []);
@@ -139,7 +142,9 @@ function AppInner() {
           <PageWrap key="identified">
             <PhaseIdentified
               plastic={plastic}
+              scanData={scanData}
               onNext={() => setPhase('quiz')}
+              onOverride={(id) => { setIdentifiedId(id); setPhase('quiz'); }}
             />
           </PageWrap>
         )}
