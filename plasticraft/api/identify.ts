@@ -144,7 +144,7 @@ export default async function handler(req: Request): Promise<Response> {
   const mediaMatch = body.image.match(/^data:(image\/\w+);base64,/);
   const mimeType = mediaMatch?.[1] ?? 'image/jpeg';
 
-  const apiKey = process.env.GOOGLE_API_KEY ?? '';
+  const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? '';
   const model = 'gemini-2.5-flash-preview-04-17';
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 

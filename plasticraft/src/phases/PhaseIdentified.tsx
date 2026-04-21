@@ -153,29 +153,36 @@ export function PhaseIdentified({ plastic, scanData, onNext, onOverride }: Props
             <p style={{ textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)', margin: '0 0 8px' }}>
               ♻️ <T s={RESHAPE_TITLE} />
             </p>
-            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
               {obj.reshape_suggestions.slice(0, 3).map((s, i) => {
                 const label = lang === 'zh' ? s.item_zh : lang === 'ja' ? s.item_ja : s.item_en;
+                const imgSrc = `https://source.unsplash.com/160x120/?${encodeURIComponent(s.image_search_query)}`;
                 return (
                   <motion.div
                     key={i}
-                    initial={{ opacity: 0, scale: 0.85 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: i * 0.12 }}
+                    initial={{ opacity: 0, y: 12 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.18 }}
                     style={{
-                      background: `rgba(${hexToRgb(plastic.color)}, 0.1)`,
-                      border: `1.5px solid ${plastic.color}`,
-                      borderRadius: 10,
-                      padding: '8px 12px',
-                      fontSize: '0.8rem',
+                      display: 'flex',
+                      flexDirection: 'column',
+                      alignItems: 'center',
+                      gap: 6,
+                      flex: '1 1 0',
+                      minWidth: 0,
+                    }}
+                  >
+                    <ReshapeImage src={imgSrc} alt={label} color={plastic.color} />
+                    <span style={{
+                      fontSize: '0.75rem',
                       fontWeight: 600,
                       color: 'var(--text)',
                       textAlign: 'center',
-                      maxWidth: 140,
-                      lineHeight: 1.35,
-                    }}
-                  >
-                    {label}
+                      lineHeight: 1.3,
+                      padding: '0 4px',
+                    }}>
+                      {label}
+                    </span>
                   </motion.div>
                 );
               })}
@@ -277,6 +284,35 @@ export function PhaseIdentified({ plastic, scanData, onNext, onOverride }: Props
           </motion.button>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+/* Image card for a reshape suggestion — falls back to emoji on error */
+function ReshapeImage({ src, alt, color }: { src: string; alt: string; color: string }) {
+  const [failed, setFailed] = useState(false);
+  return (
+    <div style={{
+      width: '100%',
+      aspectRatio: '4/3',
+      borderRadius: 10,
+      overflow: 'hidden',
+      border: `2px solid ${color}`,
+      background: `rgba(${hexToRgb(color)}, 0.1)`,
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      fontSize: '2rem',
+    }}>
+      {failed
+        ? '♻️'
+        : <img
+            src={src}
+            alt={alt}
+            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
+            onError={() => setFailed(true)}
+          />
+      }
     </div>
   );
 }
