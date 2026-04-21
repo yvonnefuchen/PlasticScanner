@@ -66,7 +66,8 @@ export async function identifyPlastic(imageDataUrl: string): Promise<ScanResult>
   });
 
   if (!res.ok) {
-    throw new Error(`API error ${res.status}`);
+    const body = await res.text().catch(() => '');
+    throw new Error(`API ${res.status}: ${body.slice(0, 300)}`);
   }
 
   return res.json() as Promise<ScanResult>;
