@@ -4,6 +4,7 @@ import { DEMO_PLASTIC } from '../data/plastics';
 /* ── Types matching the PlastiCraft AI system prompt output schema ─────── */
 
 export interface ReshapeSuggestion {
+  emoji: string;
   item_en: string;
   item_ja: string;
   item_zh: string;
@@ -25,7 +26,9 @@ export interface DetectedObject {
   japan_bin_en: string;
   label_to_look_for_en: string;
   label_to_look_for_ja: string;
-  reasoning: string;
+  reasoning_en: string;
+  reasoning_ja: string;
+  reasoning_zh: string;
   character_message_en: string;
   character_message_ja: string;
   character_message_zh: string;
@@ -93,24 +96,29 @@ export const DEMO_SCAN_DATA: ScanData = {
       japan_bin_en: 'plastics packaging bin',
       label_to_look_for_en: "Look for 'PS' printed on the item",
       label_to_look_for_ja: "商品に『PS』と書いてある部分を探してみよう",
-      reasoning: '[DEMO MODE — Gemini API not connected] White foam texture, lightweight, flat tray shape → Polystyrene (PS). No label visible.',
+      reasoning_en: '[DEMO MODE — Gemini API not connected] White foam texture, lightweight, flat tray shape → Polystyrene (PS). No label visible.',
+      reasoning_ja: '[デモモード — Gemini API未接続] 白い発泡テクスチャ、軽量、フラットなトレイ形状 → ポリスチレン（PS）。ラベル見えず。',
+      reasoning_zh: '[示範模式 — Gemini API 未連接] 白色泡沫質地、輕盈、平板托盤形狀 → 聚苯乙烯（PS）。未見標籤。',
       character_message_en: "Hi! I am Polystyrene (PS)! I am super light — that is because I am mostly air bubbles! My melting point is 240°C. I am often used as a foam tray for meat or eggs. That is why I go in a different bin from PET bottles!",
       character_message_ja: "こんにちは！ぼくはポリスチレン（PS）！とっても軽いでしょ？それはぼくがほとんど空気のあわでできているから！融点は240°Cだよ。お肉や卵のトレイによく使われてるんだ。だからPETボトルとは別のゴミ箱に入れるんだよ！",
       character_message_zh: "你好！我是聚苯乙烯（PS）！我超級輕盈，因為我幾乎都是氣泡！我的融點是240°C，常被用來做肉品或雞蛋的托盤。這就是為什麼我要和PET瓶分開丟！",
       reshape_suggestions: [
         {
+          emoji: '🏎️',
           item_en: 'mini racetrack for toy cars',
           item_ja: 'おもちゃカーのミニコース',
           item_zh: 'PS 托盤迷你跑道',
           image_search_query: 'toy car track ramp DIY foam',
         },
         {
+          emoji: '🌱',
           item_en: 'seedling planting tray',
           item_ja: '植木の苗トレイ',
           item_zh: '種植小苗的育苗盤',
           image_search_query: 'seedling tray gardening sprouts',
         },
         {
+          emoji: '🎨',
           item_en: 'stamp printing art',
           item_ja: 'スタンプアート',
           item_zh: '泡棉印章藝術',

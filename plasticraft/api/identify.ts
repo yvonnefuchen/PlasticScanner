@@ -1,10 +1,16 @@
-/* Vercel serverless function — PlastiCraft AI plastic identifier */
+/* Vercel function — PlastiCraft AI plastic identifier */
 /* Uses @google/genai SDK with gemini-2.5-flash */
 
 import { GoogleGenAI } from '@google/genai';
 
 declare const process: { env: Record<string, string | undefined> };
 
+/*
+ * IMPORTANT: keep runtime: 'edge' — do NOT switch to serverless.
+ * The @google/genai SDK fails to bundle in Vercel's serverless (Node.js) runtime
+ * due to ESM/CJS incompatibility. Edge runtime bundles it correctly.
+ * Confirmed working: edge + @google/genai SDK + gemini-2.5-flash.
+ */
 export const config = { runtime: 'edge' };
 
 type PlasticId = 'PET' | 'HDPE' | 'PP' | 'PS' | 'PVC';
@@ -25,7 +31,8 @@ IMPORTANT RULES:
 - Use simple, encouraging language suitable for children aged 6–12.
 - Be honest about uncertainty — never pretend to be more confident than you are.
 - If you see multiple objects in one photo, identify each one separately.
-- Always fill the "reasoning" field with one or two sentences describing exactly what visual clues you used to reach your conclusion (e.g. shape, colour, texture, visible label). This is shown as a debug hint to the workshop facilitator.
+- Always fill the "reasoning_en", "reasoning_ja", and "reasoning_zh" fields with one or two sentences describing exactly what visual clues you used to reach your conclusion (e.g. shape, colour, texture, visible label). Each must be in its respective language. This is shown as a debug hint to the workshop facilitator.
+- Always include an "emoji" field in each reshape_suggestion — pick a single emoji that best represents the reshaped item.
 - Always mention the melting point as a key fact.
 - Always connect back to the core lesson: "This is why bottle caps and bottle bodies must go in different bins."
 - Do NOT reference recycling numbers (1–7). Japan does not use this numbering system. Instead, refer to the material name printed on the container and the Japan bin category.
@@ -44,7 +51,9 @@ OUTPUT FORMAT (strict JSON, no extra text outside the JSON):
       "material_code": "PP",
       "confidence": "high",
       "confidence_score": 0.85,
-      "reasoning": "Small round coloured cap with slightly waxy surface. White/opaque colour. No label visible, but visual clues strongly match PP bottle cap.",
+      "reasoning_en": "Small round coloured cap with slightly waxy surface. White/opaque colour. No label visible, but visual clues strongly match PP bottle cap.",
+      "reasoning_ja": "少し光沢のある表面を持つ小さな丸いキャップ。白色/不透明。ラベルは見えないが、視覚的な手がかりはPPのボトルキャップと強く一致する。",
+      "reasoning_zh": "小圓形蓋子，表面略有光澤，白色/不透明。雖未見標籤，但視覺線索強烈符合PP瓶蓋特徵。",
       "melting_point_celsius": 160,
       "japan_bin_ja": "プラスチック製容器包装",
       "japan_bin_en": "plastics packaging bin",
@@ -55,18 +64,21 @@ OUTPUT FORMAT (strict JSON, no extra text outside the JSON):
       "character_message_zh": "你好！我是聚丙烯（PP）！我雖然小，但非常堅韌。我的融點是160°C，比聚對苯二甲酸乙二酯（PET）低了100度。這就是為什麼我必須和PET分開丟！",
       "reshape_suggestions": [
         {
+          "emoji": "🔑",
           "item_en": "PP keychain (like the one you are making today!)",
           "item_ja": "PPキーホルダー（今日作るやつ！）",
           "item_zh": "PP鑰匙圈（就是今天要做的！）",
           "image_search_query": "DIY melted plastic bottle cap keychain craft"
         },
         {
+          "emoji": "🍱",
           "item_en": "food container",
           "item_ja": "食品容器",
           "item_zh": "食品容器",
           "image_search_query": "polypropylene food container reusable"
         },
         {
+          "emoji": "✏️",
           "item_en": "stationery organiser",
           "item_ja": "文房具入れ",
           "item_zh": "文具收納盒",

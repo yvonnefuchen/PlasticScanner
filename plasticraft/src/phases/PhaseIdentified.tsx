@@ -170,7 +170,7 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
               🌡️ <T s={MELT_LABEL} /> {obj.melting_point_celsius}°C
             </div>
           )}
-          {obj.reasoning && (
+          {(obj.reasoning_en || obj.reasoning_ja || obj.reasoning_zh) && (
             <div style={{
               marginTop: 6,
               display: 'inline-block',
@@ -184,7 +184,8 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
               maxWidth: 440,
               lineHeight: 1.4,
             }}>
-              🔍 <strong style={{ fontStyle: 'normal' }}><T s={AI_REASONING} />:</strong> {obj.reasoning}
+              🔍 <strong style={{ fontStyle: 'normal' }}><T s={AI_REASONING} />:</strong>{' '}
+              {lang === 'zh' ? obj.reasoning_zh : lang === 'ja' ? obj.reasoning_ja : obj.reasoning_en}
             </div>
           )}
         </motion.div>
@@ -199,9 +200,8 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
         onClick={uncertainty ? undefined : onNext}
         style={{
           cursor: uncertainty ? 'default' : 'pointer',
-          maxHeight: '22vh',
-          overflowY: 'auto',
-          lineHeight: 1.55,
+          fontSize: '0.88rem',
+          lineHeight: 1.5,
         }}
       >
         {characterMessage ?? <T s={plastic.mascotHint} />}
@@ -223,7 +223,6 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
               {obj.reshape_suggestions.slice(0, 3).map((s, i) => {
                 const label = lang === 'zh' ? s.item_zh : lang === 'ja' ? s.item_ja : s.item_en;
-                const imgSrc = `https://source.unsplash.com/160x120/?${encodeURIComponent(s.image_search_query)}`;
                 return (
                   <motion.div
                     key={i}
@@ -239,7 +238,19 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
                       minWidth: 0,
                     }}
                   >
-                    <ReshapeImage src={imgSrc} alt={label} color={plastic.color} />
+                    <div style={{
+                      width: '100%',
+                      aspectRatio: '1',
+                      borderRadius: 12,
+                      border: `2px solid ${plastic.color}`,
+                      background: `rgba(${hexToRgb(plastic.color)}, 0.1)`,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontSize: '2.4rem',
+                    }}>
+                      {s.emoji ?? '♻️'}
+                    </div>
                     <span style={{
                       fontSize: '0.75rem',
                       fontWeight: 600,
@@ -351,35 +362,6 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
           </motion.button>
         )}
       </AnimatePresence>
-    </div>
-  );
-}
-
-/* Image card for a reshape suggestion — falls back to emoji on error */
-function ReshapeImage({ src, alt, color }: { src: string; alt: string; color: string }) {
-  const [failed, setFailed] = useState(false);
-  return (
-    <div style={{
-      width: '100%',
-      aspectRatio: '4/3',
-      borderRadius: 10,
-      overflow: 'hidden',
-      border: `2px solid ${color}`,
-      background: `rgba(${hexToRgb(color)}, 0.1)`,
-      display: 'flex',
-      alignItems: 'center',
-      justifyContent: 'center',
-      fontSize: '2rem',
-    }}>
-      {failed
-        ? '♻️'
-        : <img
-            src={src}
-            alt={alt}
-            style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }}
-            onError={() => setFailed(true)}
-          />
-      }
     </div>
   );
 }
