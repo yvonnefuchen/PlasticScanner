@@ -5,7 +5,7 @@ import { GoogleGenAI } from '@google/genai';
 
 declare const process: { env: Record<string, string | undefined> };
 
-export const config = { maxDuration: 60 };
+export const config = { runtime: 'edge' };
 
 type PlasticId = 'PET' | 'HDPE' | 'PP' | 'PS' | 'PVC';
 const VALID_IDS: PlasticId[] = ['PET', 'HDPE', 'PP', 'PS', 'PVC'];
