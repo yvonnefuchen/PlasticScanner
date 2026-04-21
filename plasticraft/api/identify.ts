@@ -173,7 +173,6 @@ export default async function handler(req: Request): Promise<Response> {
         responseMimeType: 'application/json',
         temperature: 0.2,
         maxOutputTokens: 2048,
-        thinkingConfig: { thinkingBudget: 0 },
       },
     }),
   });
