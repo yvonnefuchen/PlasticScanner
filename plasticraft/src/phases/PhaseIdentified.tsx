@@ -336,10 +336,14 @@ function ReshapeCard({ query, emoji, label, color }: { query: string; emoji: str
   const [failed, setFailed] = useState(false);
 
   useEffect(() => {
-    fetch(`/api/image-search?q=${encodeURIComponent(query)}`)
-      .then(r => r.json())
-      .then((d: { url: string | null }) => { if (d.url) setImgUrl(d.url); })
-      .catch(() => {/* stay on emoji */});
+    /* Delay so the 3 image fetches don't race with the identify edge function */
+    const t = setTimeout(() => {
+      fetch(`/api/image-search?q=${encodeURIComponent(query)}`)
+        .then(r => r.json())
+        .then((d: { url: string | null }) => { if (d.url) setImgUrl(d.url); })
+        .catch(() => {/* stay on emoji */});
+    }, 1500);
+    return () => clearTimeout(t);
   }, [query]);
 
   return (
