@@ -18,6 +18,8 @@ const TAP_CONTINUE = { zh: '繼續', ja: '続ける', en: 'Continue' };
 const CANT_FIND    = { zh: '找不到，繼續吧', ja: 'わからない、続ける', en: "Can't find it — continue" };
 const FOUND_LABEL  = { zh: '我看到這個！', ja: 'これを見つけたよ！', en: 'I can see it printed!' };
 const FLIP_TIP     = { zh: '翻到底部或側面找找看 👀', ja: '底か横を見てみよう 👀', en: 'Flip it over and look at the bottom or side 👀' };
+const RESHAPE_TITLE = { zh: '用它可以做成這些東西：', ja: 'これに生まれ変われるよ：', en: 'This can be reshaped into:' };
+const MELT_LABEL   = { zh: '融點', ja: '融点', en: 'Melting point' };
 
 /* The 3 workshop materials a child might confirm from the printed label */
 const LABEL_OPTIONS: Array<{ id: PlasticId; code: string; color: string }> = [
@@ -30,12 +32,23 @@ export function PhaseIdentified({ plastic, scanData, onNext, onOverride }: Props
   const { lang } = useLang();
   const [showContinue, setShowContinue]         = useState(false);
   const [showUncertainty, setShowUncertainty]   = useState(false);
+  const [showReshape, setShowReshape]           = useState(false);
 
   const uncertainty = scanData?.uncertainty_prompt ?? null;
   const obj         = scanData?.detected_objects?.[0] ?? null;
 
-  /* Pick the Claude-generated character message in the current language,
-     falling back to the static mascot hint when scanData is unavailable. */
+  const objectName: string | null = obj
+    ? lang === 'zh' ? obj.object_name_zh
+    : lang === 'ja' ? obj.object_name_ja
+    : obj.object_name_en
+    : null;
+
+  const materialFull: string | null = obj
+    ? lang === 'zh' ? obj.material_full_zh
+    : lang === 'ja' ? obj.material_full_ja
+    : obj.material_full_en
+    : null;
+
   const characterMessage: string | null = obj
     ? lang === 'zh' ? obj.character_message_zh
     : lang === 'ja' ? obj.character_message_ja
@@ -50,13 +63,13 @@ export function PhaseIdentified({ plastic, scanData, onNext, onOverride }: Props
 
   useEffect(() => {
     if (uncertainty) {
-      /* medium/low: show uncertainty section quickly, skip auto-continue */
       const t = setTimeout(() => setShowUncertainty(true), 1800);
       return () => clearTimeout(t);
     } else {
-      /* high confidence: standard 4 s then show continue button */
-      const t = setTimeout(() => setShowContinue(true), 4000);
-      return () => clearTimeout(t);
+      /* high confidence: show reshape after 2s, continue button after 4s */
+      const t1 = setTimeout(() => setShowReshape(true), 2000);
+      const t2 = setTimeout(() => setShowContinue(true), 4000);
+      return () => { clearTimeout(t1); clearTimeout(t2); };
     }
   }, [uncertainty]);
 
@@ -75,8 +88,40 @@ export function PhaseIdentified({ plastic, scanData, onNext, onOverride }: Props
         color={plastic.color}
         lightColor={plastic.lightColor}
         resinCode={plastic.resinCode}
-        size={180}
+        size={150}
       />
+
+      {/* ── Material identification headline ── */}
+      {obj && (
+        <motion.div
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: 0.1 }}
+          style={{ textAlign: 'center', width: '100%' }}
+        >
+          <div style={{
+            display: 'inline-flex',
+            alignItems: 'center',
+            gap: 8,
+            background: `rgba(${hexToRgb(plastic.color)}, 0.15)`,
+            border: `2px solid ${plastic.color}`,
+            borderRadius: 12,
+            padding: '8px 16px',
+            fontSize: '1rem',
+            fontWeight: 800,
+            color: plastic.color,
+          }}>
+            <span>{objectName}</span>
+            <span style={{ opacity: 0.5 }}>→</span>
+            <span>{materialFull}</span>
+          </div>
+          {obj.melting_point_celsius && (
+            <div style={{ fontSize: '0.8rem', color: 'var(--text-dim)', marginTop: 4 }}>
+              🌡️ <T s={MELT_LABEL} /> {obj.melting_point_celsius}°C
+            </div>
+          )}
+        </motion.div>
+      )}
 
       {/* ── Character message speech bubble ── */}
       <motion.div
@@ -87,13 +132,57 @@ export function PhaseIdentified({ plastic, scanData, onNext, onOverride }: Props
         onClick={uncertainty ? undefined : onNext}
         style={{
           cursor: uncertainty ? 'default' : 'pointer',
-          maxHeight: '28vh',
+          maxHeight: '22vh',
           overflowY: 'auto',
           lineHeight: 1.55,
         }}
       >
         {characterMessage ?? <T s={plastic.mascotHint} />}
       </motion.div>
+
+      {/* ── Reshape suggestions (high confidence only) ── */}
+      <AnimatePresence>
+        {showReshape && !uncertainty && obj?.reshape_suggestions?.length && (
+          <motion.div
+            key="reshape"
+            initial={{ opacity: 0, y: 14 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            style={{ width: '100%', maxWidth: 480 }}
+          >
+            <p style={{ textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)', margin: '0 0 8px' }}>
+              ♻️ <T s={RESHAPE_TITLE} />
+            </p>
+            <div style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
+              {obj.reshape_suggestions.slice(0, 3).map((s, i) => {
+                const label = lang === 'zh' ? s.item_zh : lang === 'ja' ? s.item_ja : s.item_en;
+                return (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, scale: 0.85 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: i * 0.12 }}
+                    style={{
+                      background: `rgba(${hexToRgb(plastic.color)}, 0.1)`,
+                      border: `1.5px solid ${plastic.color}`,
+                      borderRadius: 10,
+                      padding: '8px 12px',
+                      fontSize: '0.8rem',
+                      fontWeight: 600,
+                      color: 'var(--text)',
+                      textAlign: 'center',
+                      maxWidth: 140,
+                      lineHeight: 1.35,
+                    }}
+                  >
+                    {label}
+                  </motion.div>
+                );
+              })}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Uncertainty section (medium / low confidence) ── */}
       <AnimatePresence>
