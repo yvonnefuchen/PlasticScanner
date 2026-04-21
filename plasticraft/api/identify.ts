@@ -1,7 +1,8 @@
-/* Vercel edge function — PlastiCraft AI plastic identifier */
-/* Uses Google Gemini gemini-2.5-flash via REST API */
+/* Vercel serverless function — PlastiCraft AI plastic identifier */
+/* Uses @google/genai SDK with gemini-2.5-flash */
 
-/* process.env is available in Vercel edge runtime but not in browser TS types */
+import { GoogleGenAI } from '@google/genai';
+
 declare const process: { env: Record<string, string | undefined> };
 
 export const config = { maxDuration: 60 };
@@ -134,29 +135,6 @@ ALWAYS REMEMBER:
 - PS recycling varies by municipality — always add a note to check local rules.
 - Uncertainty is a teaching moment, not a failure. Guide the child to look for the printed material name on the object.`;
 
-/* ── Exponential backoff fetch ───────────────────────────────────────────── */
-async function fetchWithRetry(
-  url: string,
-  init: RequestInit,
-  maxAttempts = 3,
-): Promise<globalThis.Response> {
-  let lastErr: unknown;
-  for (let attempt = 0; attempt < maxAttempts; attempt++) {
-    if (attempt > 0) {
-      await new Promise(r => setTimeout(r, 500 * 2 ** attempt));
-    }
-    try {
-      const res = await fetch(url, init);
-      // Retry on transient 5xx only
-      if (res.status >= 500 && attempt < maxAttempts - 1) continue;
-      return res;
-    } catch (e) {
-      lastErr = e;
-    }
-  }
-  throw lastErr;
-}
-
 /* ── Handler ─────────────────────────────────────────────────────────────── */
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
@@ -172,17 +150,19 @@ export default async function handler(req: Request): Promise<Response> {
   const mediaMatch = body.image.match(/^data:(image\/\w+);base64,/);
   const mimeType = mediaMatch?.[1] ?? 'image/jpeg';
 
-  const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? '';
-  // gemini-2.5-flash: stable, multimodal, thinking disabled for fast JSON output
-  const model = 'gemini-2.5-flash';
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+  const ai = new GoogleGenAI({
+    apiKey: process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? '',
+  });
 
-  const apiRes = await fetchWithRetry(endpoint, {
-    method: 'POST',
-    headers: { 'content-type': 'application/json' },
-    body: JSON.stringify({
-      systemInstruction: {
-        parts: [{ text: SYSTEM_PROMPT }],
+  let rawText = '';
+  try {
+    const result = await ai.models.generateContent({
+      model: 'gemini-2.5-flash',
+      config: {
+        systemInstruction: SYSTEM_PROMPT,
+        thinkingConfig: { thinkingBudget: 0 },
+        temperature: 0.2,
+        maxOutputTokens: 2048,
       },
       contents: [
         {
@@ -193,29 +173,11 @@ export default async function handler(req: Request): Promise<Response> {
           ],
         },
       ],
-      generationConfig: {
-        responseMimeType: 'application/json',
-        temperature: 0.2,
-        maxOutputTokens: 2048,
-        thinkingConfig: { thinkingBudget: 0 },
-      },
-    }),
-  });
-
-  if (!apiRes.ok) {
-    const errText = await apiRes.text();
-    return new Response(`Gemini API error: ${errText}`, { status: 502 });
+    });
+    rawText = (result.text ?? '').trim();
+  } catch (e) {
+    return new Response(`Gemini SDK error: ${String(e)}`, { status: 502 });
   }
-
-  const apiData = await apiRes.json() as {
-    candidates?: Array<{
-      content?: { parts?: Array<{ thought?: boolean; text?: string }> };
-    }>;
-  };
-
-  // Filter out thought parts — thinking models emit them before the JSON output
-  const parts = apiData.candidates?.[0]?.content?.parts ?? [];
-  const rawText = parts.find(p => !p.thought)?.text?.trim() ?? '';
 
   // Strip any accidental markdown code fences
   const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
@@ -224,7 +186,7 @@ export default async function handler(req: Request): Promise<Response> {
   try {
     scanData = JSON.parse(jsonText);
   } catch {
-    return new Response(`Failed to parse AI response as JSON: ${rawText.slice(0, 200)}`, { status: 502 });
+    return new Response(`Failed to parse AI response as JSON: ${rawText.slice(0, 300)}`, { status: 502 });
   }
 
   const sd = scanData as {
@@ -233,9 +195,8 @@ export default async function handler(req: Request): Promise<Response> {
     overall_confidence?: string;
   };
 
-  // Pick the highest-confidence detected object
   const primary = sd.detected_objects?.sort(
-    (a, b) => (b.confidence_score ?? 0) - (a.confidence_score ?? 0)
+    (a, b) => (b.confidence_score ?? 0) - (a.confidence_score ?? 0),
   )?.[0];
 
   if (!primary) {
