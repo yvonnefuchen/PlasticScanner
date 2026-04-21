@@ -1,6 +1,9 @@
 /* Vercel edge function — PlastiCraft AI plastic identifier */
 /* Uses Google Gemini gemini-2.5-flash via REST API */
 
+/* process.env is available in Vercel edge runtime but not in browser TS types */
+declare const process: { env: Record<string, string | undefined> };
+
 export const config = { runtime: 'edge' };
 
 type PlasticId = 'PET' | 'HDPE' | 'PP' | 'PS' | 'PVC';
