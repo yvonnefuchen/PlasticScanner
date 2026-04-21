@@ -87,10 +87,10 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
     }
   };
 
-  return (
-    <div className="phase-container" style={{ '--accent': plastic.color } as React.CSSProperties}>
-      {/* ── Scan error banner ── */}
-      {scanError && (
+  /* When scan failed, only show the error banner — no placeholder content */
+  if (scanError) {
+    return (
+      <div className="phase-container" style={{ '--accent': plastic.color } as React.CSSProperties}>
         <motion.div
           initial={{ opacity: 0, y: -8 }}
           animate={{ opacity: 1, y: 0 }}
@@ -99,40 +99,39 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
             background: 'rgba(239,83,80,0.12)',
             border: '1.5px solid #EF5350',
             borderRadius: 12,
-            padding: '10px 14px',
-            fontSize: '0.82rem',
+            padding: '16px',
+            fontSize: '0.85rem',
             color: 'var(--text)',
             lineHeight: 1.5,
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 10,
           }}
         >
-          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
-            <span style={{ fontWeight: 700, color: '#EF5350' }}>
-              ⚠️ <T s={SCAN_FAIL_MSG} />
-            </span>
-            <button
-              onClick={() => setShowDebug(v => !v)}
-              style={{ fontSize: '0.7rem', color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
-            >
-              {showDebug ? 'hide debug' : 'debug'}
-            </button>
-          </div>
+          <div style={{ fontWeight: 700, color: '#EF5350' }}>⚠️ <T s={SCAN_FAIL_MSG} /></div>
+          <button
+            onClick={() => setShowDebug(v => !v)}
+            style={{ fontSize: '0.72rem', color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', alignSelf: 'flex-start' }}
+          >
+            {showDebug ? 'hide debug' : 'debug'}
+          </button>
           {showDebug && (
-            <div style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--text-dim)', marginBottom: 8, wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}>
+            <div style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--text-dim)', wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}>
               {scanError}
             </div>
           )}
           {onRetry && (
-            <button
-              className="btn-secondary"
-              style={{ fontSize: '0.82rem' }}
-              onClick={onRetry}
-            >
+            <button className="btn-secondary" style={{ fontSize: '0.85rem' }} onClick={onRetry}>
               📷 <T s={RETRY_LABEL} />
             </button>
           )}
         </motion.div>
-      )}
+      </div>
+    );
+  }
 
+  return (
+    <div className="phase-container phase-container--scroll" style={{ '--accent': plastic.color } as React.CSSProperties}>
       <PlasticMascot
         state="talking"
         color={plastic.color}
@@ -224,43 +223,8 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
               {obj.reshape_suggestions.slice(0, 3).map((s, i) => {
                 const label = lang === 'zh' ? s.item_zh : lang === 'ja' ? s.item_ja : s.item_en;
                 return (
-                  <motion.div
-                    key={i}
-                    initial={{ opacity: 0, y: 12 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: i * 0.18 }}
-                    style={{
-                      display: 'flex',
-                      flexDirection: 'column',
-                      alignItems: 'center',
-                      gap: 6,
-                      flex: '1 1 0',
-                      minWidth: 0,
-                    }}
-                  >
-                    <div style={{
-                      width: '100%',
-                      aspectRatio: '1',
-                      borderRadius: 12,
-                      border: `2px solid ${plastic.color}`,
-                      background: `rgba(${hexToRgb(plastic.color)}, 0.1)`,
-                      display: 'flex',
-                      alignItems: 'center',
-                      justifyContent: 'center',
-                      fontSize: '2.4rem',
-                    }}>
-                      {s.emoji ?? '♻️'}
-                    </div>
-                    <span style={{
-                      fontSize: '0.75rem',
-                      fontWeight: 600,
-                      color: 'var(--text)',
-                      textAlign: 'center',
-                      lineHeight: 1.3,
-                      padding: '0 4px',
-                    }}>
-                      {label}
-                    </span>
+                  <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: i * 0.18 }} style={{ flex: '1 1 0', minWidth: 0 }}>
+                    <ReshapeCard query={s.image_search_query} emoji={s.emoji ?? '♻️'} label={label} color={plastic.color} />
                   </motion.div>
                 );
               })}
@@ -362,6 +326,51 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
           </motion.button>
         )}
       </AnimatePresence>
+    </div>
+  );
+}
+
+/* Image card — fetches from /api/image-search, falls back to emoji */
+function ReshapeCard({ query, emoji, label, color }: { query: string; emoji: string; label: string; color: string }) {
+  const [imgUrl, setImgUrl] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    fetch(`/api/image-search?q=${encodeURIComponent(query)}`)
+      .then(r => r.json())
+      .then((d: { url: string | null }) => { if (d.url) setImgUrl(d.url); })
+      .catch(() => {/* stay on emoji */});
+  }, [query]);
+
+  return (
+    <div style={{
+      display: 'flex',
+      flexDirection: 'column',
+      alignItems: 'center',
+      gap: 6,
+      flex: '1 1 0',
+      minWidth: 0,
+    }}>
+      <div style={{
+        width: '100%',
+        aspectRatio: '4/3',
+        borderRadius: 12,
+        border: `2px solid ${color}`,
+        background: `rgba(${hexToRgb(color)}, 0.1)`,
+        overflow: 'hidden',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        fontSize: '2.4rem',
+      }}>
+        {imgUrl && !failed
+          ? <img src={imgUrl} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={() => setFailed(true)} />
+          : emoji || '♻️'
+        }
+      </div>
+      <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text)', textAlign: 'center', lineHeight: 1.3, padding: '0 4px' }}>
+        {label}
+      </span>
     </div>
   );
 }
