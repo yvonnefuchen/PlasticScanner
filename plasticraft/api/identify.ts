@@ -1,12 +1,12 @@
 /* Vercel edge function — PlastiCraft AI plastic identifier */
-/* Uses Anthropic Claude claude-sonnet-4-6 with prompt caching */
+/* Uses Google Gemini gemini-2.5-flash via REST API */
 
 export const config = { runtime: 'edge' };
 
 type PlasticId = 'PET' | 'HDPE' | 'PP' | 'PS' | 'PVC';
 const VALID_IDS: PlasticId[] = ['PET', 'HDPE', 'PP', 'PS', 'PVC'];
 
-/* ── System prompt (cached across requests in the same session) ─────────── */
+/* ── System prompt ──────────────────────────────────────────────────────── */
 const SYSTEM_PROMPT = `You are PlastiCraft AI, a friendly plastic material identification assistant designed for children aged 6–12 in a recycling education workshop held in Japan.
 
 Your job is to:
@@ -142,56 +142,48 @@ export default async function handler(req: Request): Promise<Response> {
 
   const base64 = body.image.replace(/^data:image\/\w+;base64,/, '');
   const mediaMatch = body.image.match(/^data:(image\/\w+);base64,/);
-  const mimeType = (mediaMatch?.[1] ?? 'image/jpeg') as
-    'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp';
+  const mimeType = mediaMatch?.[1] ?? 'image/jpeg';
 
-  /* Call Anthropic API with prompt caching on the system prompt */
-  const apiRes = await fetch('https://api.anthropic.com/v1/messages', {
+  const apiKey = process.env.GOOGLE_API_KEY ?? '';
+  const model = 'gemini-2.5-flash-preview-04-17';
+  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+  const apiRes = await fetch(endpoint, {
     method: 'POST',
-    headers: {
-      'x-api-key': process.env.ANTHROPIC_API_KEY ?? '',
-      'anthropic-version': '2023-06-01',
-      'anthropic-beta': 'prompt-caching-2024-07-31',
-      'content-type': 'application/json',
-    },
+    headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 2048,
-      system: [
-        {
-          type: 'text',
-          text: SYSTEM_PROMPT,
-          cache_control: { type: 'ephemeral' },
-        },
-      ],
-      messages: [
+      systemInstruction: {
+        parts: [{ text: SYSTEM_PROMPT }],
+      },
+      contents: [
         {
           role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: mimeType, data: base64 },
-            },
-            {
-              type: 'text',
-              text: 'Please identify the plastic material(s) in this photo.',
-            },
+          parts: [
+            { inlineData: { mimeType, data: base64 } },
+            { text: 'Please identify the plastic material(s) in this photo.' },
           ],
         },
       ],
+      generationConfig: {
+        responseMimeType: 'application/json',
+        temperature: 0.2,
+        maxOutputTokens: 2048,
+      },
     }),
   });
 
   if (!apiRes.ok) {
     const errText = await apiRes.text();
-    return new Response(`Anthropic API error: ${errText}`, { status: 502 });
+    return new Response(`Gemini API error: ${errText}`, { status: 502 });
   }
 
   const apiData = await apiRes.json() as {
-    content: Array<{ type: string; text: string }>;
+    candidates?: Array<{
+      content?: { parts?: Array<{ text?: string }> };
+    }>;
   };
 
-  const rawText = apiData.content.find(c => c.type === 'text')?.text?.trim() ?? '';
+  const rawText = apiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? '';
 
   // Strip any accidental markdown code fences
   const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
