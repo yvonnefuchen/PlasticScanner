@@ -38,6 +38,7 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
   const [showContinue, setShowContinue]         = useState(false);
   const [showUncertainty, setShowUncertainty]   = useState(false);
   const [showReshape, setShowReshape]           = useState(false);
+  const [showDebug, setShowDebug]               = useState(false);
 
   const uncertainty = scanData?.uncertainty_prompt ?? null;
   const obj         = scanData?.detected_objects?.[0] ?? null;
@@ -104,12 +105,22 @@ export function PhaseIdentified({ plastic, scanData, scanError, onNext, onRetry,
             lineHeight: 1.5,
           }}
         >
-          <div style={{ fontWeight: 700, color: '#EF5350', marginBottom: 6 }}>
-            ⚠️ <T s={SCAN_FAIL_MSG} />
+          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginBottom: 6 }}>
+            <span style={{ fontWeight: 700, color: '#EF5350' }}>
+              ⚠️ <T s={SCAN_FAIL_MSG} />
+            </span>
+            <button
+              onClick={() => setShowDebug(v => !v)}
+              style={{ fontSize: '0.7rem', color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline' }}
+            >
+              {showDebug ? 'hide debug' : 'debug'}
+            </button>
           </div>
-          <div style={{ fontFamily: 'monospace', fontSize: '0.74rem', color: 'var(--text-dim)', marginBottom: 8, wordBreak: 'break-all' }}>
-            {scanError}
-          </div>
+          {showDebug && (
+            <div style={{ fontFamily: 'monospace', fontSize: '0.72rem', color: 'var(--text-dim)', marginBottom: 8, wordBreak: 'break-all', whiteSpace: 'pre-wrap' }}>
+              {scanError}
+            </div>
+          )}
           {onRetry && (
             <button
               className="btn-secondary"
