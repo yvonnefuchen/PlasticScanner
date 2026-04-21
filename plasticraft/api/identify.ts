@@ -134,6 +134,29 @@ ALWAYS REMEMBER:
 - PS recycling varies by municipality — always add a note to check local rules.
 - Uncertainty is a teaching moment, not a failure. Guide the child to look for the printed material name on the object.`;
 
+/* ── Exponential backoff fetch ───────────────────────────────────────────── */
+async function fetchWithRetry(
+  url: string,
+  init: RequestInit,
+  maxAttempts = 3,
+): Promise<globalThis.Response> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    if (attempt > 0) {
+      await new Promise(r => setTimeout(r, 500 * 2 ** attempt));
+    }
+    try {
+      const res = await fetch(url, init);
+      // Retry on transient 5xx only
+      if (res.status >= 500 && attempt < maxAttempts - 1) continue;
+      return res;
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr;
+}
+
 /* ── Handler ─────────────────────────────────────────────────────────────── */
 export default async function handler(req: Request): Promise<Response> {
   if (req.method !== 'POST') {
@@ -150,10 +173,11 @@ export default async function handler(req: Request): Promise<Response> {
   const mimeType = mediaMatch?.[1] ?? 'image/jpeg';
 
   const apiKey = process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? '';
-  const model = 'gemini-3-flash-preview';
+  // gemini-2.5-flash: stable, multimodal, thinking disabled for fast JSON output
+  const model = 'gemini-2.5-flash';
   const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
-  const apiRes = await fetch(endpoint, {
+  const apiRes = await fetchWithRetry(endpoint, {
     method: 'POST',
     headers: { 'content-type': 'application/json' },
     body: JSON.stringify({
@@ -173,6 +197,7 @@ export default async function handler(req: Request): Promise<Response> {
         responseMimeType: 'application/json',
         temperature: 0.2,
         maxOutputTokens: 2048,
+        thinkingConfig: { thinkingBudget: 0 },
       },
     }),
   });
@@ -184,11 +209,13 @@ export default async function handler(req: Request): Promise<Response> {
 
   const apiData = await apiRes.json() as {
     candidates?: Array<{
-      content?: { parts?: Array<{ text?: string }> };
+      content?: { parts?: Array<{ thought?: boolean; text?: string }> };
     }>;
   };
 
-  const rawText = apiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() ?? '';
+  // Filter out thought parts — thinking models emit them before the JSON output
+  const parts = apiData.candidates?.[0]?.content?.parts ?? [];
+  const rawText = parts.find(p => !p.thought)?.text?.trim() ?? '';
 
   // Strip any accidental markdown code fences
   const jsonText = rawText.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/, '').trim();
