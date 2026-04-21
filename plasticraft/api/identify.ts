@@ -169,10 +169,10 @@ export default async function handler(req: Request): Promise<Response> {
   let rawText = '';
   try {
     const result = await ai.models.generateContent({
-      model: 'gemini-3.1-flash-lite-preview',
+      model: 'gemini-2.5-flash',
       config: {
         systemInstruction: SYSTEM_PROMPT,
-        thinkingConfig: { thinkingBudget: 0 },
+        thinkingConfig: { thinkingBudget: 0 }, /* must be 0 — thinking models timeout in 25s edge limit */
         temperature: 0.2,
         maxOutputTokens: 2048,
       },
