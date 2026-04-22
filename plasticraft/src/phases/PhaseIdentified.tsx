@@ -365,7 +365,7 @@ export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, o
   );
 }
 
-/* Image card — sends original photo + reshape target to /api/reshape-image */
+/* Image card — sends original photo + reshape target to /api/reshape-image; silently falls back to emoji on failure */
 function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color }: {
   sourceImage: string | null;
   objectName: string;
@@ -376,12 +376,12 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color }: 
 }) {
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [imgFailed, setImgFailed] = useState(false);
-  const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading');
+  const [loading, setLoading] = useState(true);
   const [debugMsg, setDebugMsg] = useState<string>('');
+  const [showDebug, setShowDebug] = useState(false);
 
   useEffect(() => {
-    console.log('[ReshapeCard] mounting — query:', reshape, '| objectName:', objectName, '| hasImage:', !!sourceImage);
-
+    console.log('[ReshapeCard] mounting — query:', reshape);
     const t = setTimeout(() => {
       console.log('[ReshapeCard] fetching /api/reshape-image for:', reshape);
       fetch('/api/reshape-image', {
@@ -391,67 +391,58 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color }: 
       })
         .then(async r => {
           const text = await r.text();
-          console.log('[ReshapeCard] HTTP', r.status, 'for', reshape, '— body:', text.slice(0, 200));
-          if (!r.ok) {
-            setStatus('error');
-            setDebugMsg(`HTTP ${r.status}: ${text.slice(0, 80)}`);
-            return;
-          }
-          let d: { url: string | null; error?: string };
-          try { d = JSON.parse(text); } catch {
-            setStatus('error');
-            setDebugMsg(`JSON parse fail: ${text.slice(0, 60)}`);
-            return;
-          }
+          console.log('[ReshapeCard] HTTP', r.status, 'for', reshape, '—', text.slice(0, 160));
+          let d: { url: string | null; error?: string } = { url: null };
+          try { d = JSON.parse(text); } catch { d = { url: null, error: `parse fail: ${text.slice(0, 60)}` }; }
           if (d.url) {
-            console.log('[ReshapeCard] image received ✓ for:', reshape);
             setImgUrl(d.url);
-            setStatus('ok');
           } else {
-            console.warn('[ReshapeCard] url is null for:', reshape, d.error ?? '');
-            setStatus('error');
-            setDebugMsg(d.error ? d.error.slice(0, 80) : 'url=null');
+            setDebugMsg(d.error ?? 'url=null');
           }
         })
         .catch(err => {
-          console.error('[ReshapeCard] fetch failed for:', reshape, err);
-          setStatus('error');
-          setDebugMsg(String(err).slice(0, 80));
-        });
+          console.error('[ReshapeCard] fetch error:', err);
+          setDebugMsg(String(err).slice(0, 100));
+        })
+        .finally(() => setLoading(false));
     }, 800);
     return () => clearTimeout(t);
-  }, [sourceImage, objectName, reshape]);
+  }, [objectName, reshape]);
+
+  const showEmoji = !imgUrl || imgFailed;
 
   return (
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: '1 1 0', minWidth: 0 }}>
       <div style={{
         width: '100%', aspectRatio: '4/3', borderRadius: 12,
-        border: `2px solid ${status === 'error' ? '#EF5350' : color}`,
+        border: `2px solid ${color}`,
         background: `rgba(${hexToRgb(color)}, 0.1)`,
         overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: status === 'loading' ? '1.1rem' : '2.4rem',
-        flexDirection: 'column', gap: 4, position: 'relative',
+        fontSize: '2.4rem',
       }}>
         {imgUrl && !imgFailed
           ? <img src={imgUrl} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={() => setImgFailed(true)} />
-          : status === 'loading'
-            ? <span style={{ color: 'var(--text-dim)', fontSize: '0.7rem', textAlign: 'center', padding: '4px' }}>⏳ generating…</span>
-            : status === 'error'
-              ? <span style={{ fontSize: '1.6rem' }}>⚠️</span>
-              : (emoji || '♻️')
+          : loading
+            ? <span style={{ fontSize: '1rem', color: 'var(--text-dim)' }}>⏳</span>
+            : (emoji || '♻️')
         }
       </div>
       <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text)', textAlign: 'center', lineHeight: 1.3, padding: '0 4px' }}>
         {label}
       </span>
-      {/* Debug label — visible on screen */}
-      {status === 'error' && (
-        <span style={{ fontSize: '0.6rem', color: '#EF5350', textAlign: 'center', lineHeight: 1.2, wordBreak: 'break-all', padding: '0 2px' }}>
-          {debugMsg || 'failed'}
-        </span>
+      {/* Debug toggle — only shown when there's something to report */}
+      {!loading && showEmoji && debugMsg && (
+        <button
+          onClick={() => setShowDebug(v => !v)}
+          style={{ fontSize: '0.55rem', color: 'var(--text-dim)', background: 'none', border: 'none', cursor: 'pointer', textDecoration: 'underline', padding: 0 }}
+        >
+          debug
+        </button>
       )}
-      {status === 'loading' && (
-        <span style={{ fontSize: '0.6rem', color: 'var(--text-dim)', textAlign: 'center' }}>…</span>
+      {showDebug && (
+        <span style={{ fontSize: '0.6rem', color: '#FFAB40', textAlign: 'center', lineHeight: 1.2, wordBreak: 'break-all', padding: '0 2px', maxWidth: '100%' }}>
+          {debugMsg}
+        </span>
       )}
     </div>
   );
