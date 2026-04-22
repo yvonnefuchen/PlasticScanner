@@ -61,7 +61,9 @@ export default async function handler(req: Request): Promise<Response> {
     });
 
     if (!res.ok) {
-      return Response.json({ url: null });
+      const errBody = await res.text().catch(() => '');
+      console.error('[reshape-image] Gemini HTTP', res.status, errBody.slice(0, 300));
+      return Response.json({ url: null, error: `Gemini ${res.status}: ${errBody.slice(0, 120)}` });
     }
 
     const data = await res.json() as {
@@ -69,19 +71,26 @@ export default async function handler(req: Request): Promise<Response> {
         content?: {
           parts?: Array<{
             inlineData?: { mimeType: string; data: string };
+            text?: string;
           }>;
         };
       }>;
     };
 
+    console.log('[reshape-image] candidates count:', data.candidates?.length ?? 0);
+
     const imgPart = data.candidates?.[0]?.content?.parts?.find(p => p.inlineData);
     if (!imgPart?.inlineData) {
-      return Response.json({ url: null });
+      const textParts = data.candidates?.[0]?.content?.parts?.map(p => p.text).filter(Boolean).join(' ');
+      console.warn('[reshape-image] no inlineData in response. text parts:', textParts?.slice(0, 200));
+      return Response.json({ url: null, error: `no image in response. text: ${(textParts ?? 'none').slice(0, 100)}` });
     }
 
     const { mimeType, data: base64 } = imgPart.inlineData;
+    console.log('[reshape-image] image generated ✓ mimeType:', mimeType, 'base64 length:', base64.length);
     return Response.json({ url: `data:${mimeType};base64,${base64}` });
-  } catch {
-    return Response.json({ url: null });
+  } catch (e) {
+    console.error('[reshape-image] caught exception:', e);
+    return Response.json({ url: null, error: String(e).slice(0, 120) });
   }
 }

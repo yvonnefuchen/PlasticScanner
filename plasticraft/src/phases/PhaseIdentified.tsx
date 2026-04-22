@@ -52,6 +52,13 @@ export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, o
   const uncertainty = scanData?.uncertainty_prompt ?? null;
   const obj         = scanData?.detected_objects?.[0] ?? null;
 
+  // Debug: log what the identify API returned
+  useEffect(() => {
+    console.log('[PhaseIdentified] scanData:', scanData);
+    console.log('[PhaseIdentified] obj:', obj);
+    console.log('[PhaseIdentified] reshape_suggestions:', obj?.reshape_suggestions);
+  }, [scanData, obj]);
+
   const pick = <T,>(zh: T, ja: T, en: T) =>
     lang === 'zh' ? zh : lang === 'ja' ? ja : en;
 
@@ -358,7 +365,7 @@ export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, o
   );
 }
 
-/* Image card — sends original photo + reshape target to /api/reshape-image (Nano Banana) */
+/* Image card — sends original photo + reshape target to /api/reshape-image */
 function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color }: {
   sourceImage: string | null;
   objectName: string;
@@ -368,23 +375,49 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color }: 
   color: string;
 }) {
   const [imgUrl, setImgUrl] = useState<string | null>(null);
-  const [failed, setFailed] = useState(false);
+  const [imgFailed, setImgFailed] = useState(false);
+  const [status, setStatus] = useState<'loading' | 'ok' | 'error'>('loading');
+  const [debugMsg, setDebugMsg] = useState<string>('');
 
   useEffect(() => {
-    /* Short delay so image generation doesn't race with the identify edge function cold start */
+    console.log('[ReshapeCard] mounting — query:', reshape, '| objectName:', objectName, '| hasImage:', !!sourceImage);
+
     const t = setTimeout(() => {
+      console.log('[ReshapeCard] fetching /api/reshape-image for:', reshape);
       fetch('/api/reshape-image', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          imageDataUrl: sourceImage,
-          objectName,
-          reshapeTarget: reshape,
-        }),
+        body: JSON.stringify({ imageDataUrl: sourceImage, objectName, reshapeTarget: reshape }),
       })
-        .then(r => r.json())
-        .then((d: { url: string | null }) => { if (d.url) setImgUrl(d.url); })
-        .catch(() => {/* stay on emoji */});
+        .then(async r => {
+          const text = await r.text();
+          console.log('[ReshapeCard] HTTP', r.status, 'for', reshape, '— body:', text.slice(0, 200));
+          if (!r.ok) {
+            setStatus('error');
+            setDebugMsg(`HTTP ${r.status}: ${text.slice(0, 80)}`);
+            return;
+          }
+          let d: { url: string | null; error?: string };
+          try { d = JSON.parse(text); } catch {
+            setStatus('error');
+            setDebugMsg(`JSON parse fail: ${text.slice(0, 60)}`);
+            return;
+          }
+          if (d.url) {
+            console.log('[ReshapeCard] image received ✓ for:', reshape);
+            setImgUrl(d.url);
+            setStatus('ok');
+          } else {
+            console.warn('[ReshapeCard] url is null for:', reshape, d.error ?? '');
+            setStatus('error');
+            setDebugMsg(d.error ? d.error.slice(0, 80) : 'url=null');
+          }
+        })
+        .catch(err => {
+          console.error('[ReshapeCard] fetch failed for:', reshape, err);
+          setStatus('error');
+          setDebugMsg(String(err).slice(0, 80));
+        });
     }, 800);
     return () => clearTimeout(t);
   }, [sourceImage, objectName, reshape]);
@@ -393,19 +426,33 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color }: 
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: '1 1 0', minWidth: 0 }}>
       <div style={{
         width: '100%', aspectRatio: '4/3', borderRadius: 12,
-        border: `2px solid ${color}`,
+        border: `2px solid ${status === 'error' ? '#EF5350' : color}`,
         background: `rgba(${hexToRgb(color)}, 0.1)`,
         overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '2.4rem',
+        fontSize: status === 'loading' ? '1.1rem' : '2.4rem',
+        flexDirection: 'column', gap: 4, position: 'relative',
       }}>
-        {imgUrl && !failed
-          ? <img src={imgUrl} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={() => setFailed(true)} />
-          : emoji || '♻️'
+        {imgUrl && !imgFailed
+          ? <img src={imgUrl} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={() => setImgFailed(true)} />
+          : status === 'loading'
+            ? <span style={{ color: 'var(--text-dim)', fontSize: '0.7rem', textAlign: 'center', padding: '4px' }}>⏳ generating…</span>
+            : status === 'error'
+              ? <span style={{ fontSize: '1.6rem' }}>⚠️</span>
+              : (emoji || '♻️')
         }
       </div>
       <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text)', textAlign: 'center', lineHeight: 1.3, padding: '0 4px' }}>
         {label}
       </span>
+      {/* Debug label — visible on screen */}
+      {status === 'error' && (
+        <span style={{ fontSize: '0.6rem', color: '#EF5350', textAlign: 'center', lineHeight: 1.2, wordBreak: 'break-all', padding: '0 2px' }}>
+          {debugMsg || 'failed'}
+        </span>
+      )}
+      {status === 'loading' && (
+        <span style={{ fontSize: '0.6rem', color: 'var(--text-dim)', textAlign: 'center' }}>…</span>
+      )}
     </div>
   );
 }
