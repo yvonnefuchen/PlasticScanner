@@ -39,6 +39,7 @@ function AppInner() {
   const [identifiedId, setIdentifiedId] = useState<PlasticId>(DEMO_PLASTIC);
   const [scanData, setScanData] = useState<ScanData | null>(null);
   const [scanError, setScanError] = useState<string | null>(null);
+  const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<number | null>(null);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const scannerRef = useRef<ScannerHandle>(null);
@@ -65,6 +66,7 @@ function AppInner() {
   const handleCapture = useCallback(async (dataUrl: string) => {
     setPhase('analyzing');
     setCountdown(null);
+    setCapturedImage(dataUrl);
     try {
       const result = await identifyPlastic(dataUrl);
       setIdentifiedId(result.plasticId);
@@ -147,6 +149,7 @@ function AppInner() {
               plastic={plastic}
               scanData={scanData}
               scanError={scanError}
+              capturedImage={capturedImage}
               onNext={() => setPhase('quiz')}
               onRetry={() => setPhase('scanning')}
               onOverride={(id) => { setIdentifiedId(id); setPhase('quiz'); }}
