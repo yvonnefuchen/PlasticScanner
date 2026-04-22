@@ -415,17 +415,37 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color }: 
     <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 6, flex: '1 1 0', minWidth: 0 }}>
       <div style={{
         width: '100%', aspectRatio: '4/3', borderRadius: 12,
-        border: `2px solid ${color}`,
-        background: `rgba(${hexToRgb(color)}, 0.1)`,
-        overflow: 'hidden', display: 'flex', alignItems: 'center', justifyContent: 'center',
-        fontSize: '2.4rem',
+        border: `2px solid ${loading ? 'rgba(110,231,247,0.3)' : color}`,
+        background: loading ? 'rgba(110,231,247,0.05)' : `rgba(${hexToRgb(color)}, 0.1)`,
+        overflow: 'hidden', display: 'flex', flexDirection: 'column',
+        alignItems: 'center', justifyContent: 'center', gap: 8,
+        fontSize: '2.4rem', position: 'relative',
       }}>
-        {imgUrl && !imgFailed
-          ? <img src={imgUrl} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={() => setImgFailed(true)} />
-          : loading
-            ? <span style={{ fontSize: '1rem', color: 'var(--text-dim)' }}>⏳</span>
-            : (emoji || '♻️')
-        }
+        {imgUrl && !imgFailed ? (
+          <img src={imgUrl} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={() => setImgFailed(true)} />
+        ) : loading ? (
+          <>
+            <motion.div
+              style={{
+                width: 28, height: 28,
+                border: '3px solid rgba(110,231,247,0.15)',
+                borderTopColor: 'var(--primary)',
+                borderRadius: '50%',
+              }}
+              animate={{ rotate: 360 }}
+              transition={{ duration: 0.9, repeat: Infinity, ease: 'linear' }}
+            />
+            <motion.span
+              style={{ fontSize: '0.65rem', color: 'var(--text-dim)', letterSpacing: '0.05em' }}
+              animate={{ opacity: [0.4, 1, 0.4] }}
+              transition={{ duration: 1.6, repeat: Infinity, ease: 'easeInOut' }}
+            >
+              generating…
+            </motion.span>
+          </>
+        ) : (
+          <span style={{ fontSize: '3.5rem', lineHeight: 1 }}>{emoji || '♻️'}</span>
+        )}
       </div>
       <span style={{ fontSize: '0.75rem', fontWeight: 600, color: 'var(--text)', textAlign: 'center', lineHeight: 1.3, padding: '0 4px' }}>
         {label}
