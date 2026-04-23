@@ -59,13 +59,34 @@ export interface ScanResult {
   scanData?: ScanData | null;
 }
 
+/* ── Image resize helper ─────────────────────────────────────────────────── */
+
+export function resizeImage(dataUrl: string, maxWidth: number): Promise<string> {
+  return new Promise((resolve) => {
+    const img = new Image();
+    img.onload = () => {
+      const scale = Math.min(1, maxWidth / img.width);
+      const w = Math.round(img.width * scale);
+      const h = Math.round(img.height * scale);
+      const canvas = document.createElement('canvas');
+      canvas.width = w;
+      canvas.height = h;
+      canvas.getContext('2d')!.drawImage(img, 0, 0, w, h);
+      resolve(canvas.toDataURL('image/jpeg', 0.75));
+    };
+    img.onerror = () => resolve(dataUrl);
+    img.src = dataUrl;
+  });
+}
+
 /* ── API call ─────────────────────────────────────────────────────────────── */
 
 export async function identifyPlastic(imageDataUrl: string): Promise<ScanResult> {
+  const small = await resizeImage(imageDataUrl, 800);
   const res = await fetch('/api/identify', {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ image: imageDataUrl }),
+    body: JSON.stringify({ image: small }),
   });
 
   if (!res.ok) {

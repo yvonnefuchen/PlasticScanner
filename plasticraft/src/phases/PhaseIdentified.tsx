@@ -6,6 +6,7 @@ import { useLang } from '../context/LangContext';
 import type { PlasticId, PlasticType } from '../data/plastics';
 import { PLASTICS } from '../data/plastics';
 import type { ScanData } from '../services/scanner';
+import { resizeImage } from '../services/scanner';
 
 interface Props {
   plastic: PlasticType;
@@ -381,32 +382,49 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color }: 
   const [showDebug, setShowDebug] = useState(false);
 
   useEffect(() => {
-    console.log('[ReshapeCard] mounting — query:', reshape);
-    const t = setTimeout(() => {
-      console.log('[ReshapeCard] fetching /api/reshape-image for:', reshape);
-      fetch('/api/reshape-image', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ imageDataUrl: sourceImage, objectName, reshapeTarget: reshape }),
-      })
-        .then(async r => {
-          const text = await r.text();
-          console.log('[ReshapeCard] HTTP', r.status, 'for', reshape, '—', text.slice(0, 160));
-          let d: { url: string | null; error?: string } = { url: null };
-          try { d = JSON.parse(text); } catch { d = { url: null, error: `parse fail: ${text.slice(0, 60)}` }; }
-          if (d.url) {
-            setImgUrl(d.url);
-          } else {
-            setDebugMsg(d.error ?? 'url=null');
+    let cancelled = false;
+    let pollId: ReturnType<typeof setInterval> | null = null;
+
+    const startTimer = setTimeout(async () => {
+      /* 1. Start the job — function returns jobId immediately */
+      let jobId: string;
+      try {
+        const smallImage = sourceImage ? await resizeImage(sourceImage, 400) : null;
+        const res = await fetch('/api/reshape-image', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ imageDataUrl: smallImage, objectName, reshapeTarget: reshape }),
+        });
+        const data = await res.json() as { jobId?: string; error?: string };
+        if (cancelled) return;
+        if (!data.jobId) { setDebugMsg(data.error ?? 'no jobId'); setLoading(false); return; }
+        jobId = data.jobId;
+      } catch (e) { if (!cancelled) { setDebugMsg(String(e).slice(0, 100)); setLoading(false); } return; }
+
+      /* 2. Poll every 4s for up to 3 minutes */
+      let elapsed = 0;
+      pollId = setInterval(async () => {
+        if (cancelled) { clearInterval(pollId!); return; }
+        elapsed += 4;
+        if (elapsed > 180) { clearInterval(pollId!); setLoading(false); return; }
+        try {
+          const res = await fetch(`/api/reshape-image?jobId=${jobId}`);
+          const data = await res.json() as { status: string; url?: string; error?: string };
+          if (data.status === 'done' || data.status === 'error') {
+            clearInterval(pollId!);
+            setLoading(false);
+            if (data.url) setImgUrl(data.url);
+            else if (data.error) setDebugMsg(data.error);
           }
-        })
-        .catch(err => {
-          console.error('[ReshapeCard] fetch error:', err);
-          setDebugMsg(String(err).slice(0, 100));
-        })
-        .finally(() => setLoading(false));
+        } catch { /* keep polling */ }
+      }, 4000);
     }, 800);
-    return () => clearTimeout(t);
+
+    return () => {
+      cancelled = true;
+      clearTimeout(startTimer);
+      if (pollId) clearInterval(pollId);
+    };
   }, [objectName, reshape]);
 
   const showEmoji = !imgUrl || imgFailed;

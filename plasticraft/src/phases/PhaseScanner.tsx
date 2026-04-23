@@ -43,6 +43,7 @@ export const PhaseScanner = forwardRef<ScannerHandle, Props>(
     const countdownActiveRef = useRef(false);
 
     const [cameraError, setCameraError] = useState(false);
+    const [isFrontCamera, setIsFrontCamera] = useState(false);
 
     // Expose capture() to parent
     useImperativeHandle(ref, () => ({
@@ -69,6 +70,8 @@ export const PhaseScanner = forwardRef<ScannerHandle, Props>(
           });
           if (cancelled) { stream.getTracks().forEach(t => t.stop()); return; }
           streamRef.current = stream;
+          const facing = stream.getVideoTracks()[0]?.getSettings().facingMode;
+          setIsFrontCamera(facing === 'user' || facing === undefined);
           if (videoRef.current) {
             videoRef.current.srcObject = stream;
             videoRef.current.play();
@@ -168,7 +171,7 @@ export const PhaseScanner = forwardRef<ScannerHandle, Props>(
     return (
       <div className="phase-container phase-scanner">
         <div className="scan-frame">
-          <video ref={videoRef} playsInline muted className="scan-video" />
+          <video ref={videoRef} playsInline muted className="scan-video" style={isFrontCamera ? { transform: 'scaleX(-1)' } : undefined} />
           {/* Hidden canvases */}
           <canvas ref={displayCanvasRef} style={{ display: 'none' }} />
           <canvas
