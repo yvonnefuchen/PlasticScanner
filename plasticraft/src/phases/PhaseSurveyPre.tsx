@@ -34,7 +34,7 @@ const SUBMIT: Tri = {
 };
 const AI_PREVIEW: Tri = {
   zh: '掃描前，先讓我展示一下我的能力！',
-  ja: 'スキャン まえに、ぼくの のうりょくを みてみよう！',
+  ja: 'スキャン まえに、ぼくの すごい ところを みてみよう！',
   en: "Before scanning, let's see what I am capable of!",
 };
 

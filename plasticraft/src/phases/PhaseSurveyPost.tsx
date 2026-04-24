@@ -29,7 +29,7 @@ const TITLE: Tri = {
 };
 const HEAD_KNOWLEDGE: Tri = {
   zh: '🧠 知識任務',
-  ja: '🧠 ちしき ミッション',
+  ja: '🧠 なにを おぼえた？ ミッション',
   en: '🧠 Knowledge Mission',
 };
 const HEAD_AI: Tri = {
@@ -39,7 +39,7 @@ const HEAD_AI: Tri = {
 };
 const HEAD_ACTION: Tri = {
   zh: '🌍 行動承諾',
-  ja: '🌍 こうどう やくそく',
+  ja: '🌍 やくそく ミッション',
   en: '🌍 Action Pledge',
 };
 const NEXT_BTN: Tri = { zh: '下一頁 →', ja: 'つぎへ →', en: 'Next →' };
@@ -91,12 +91,12 @@ const P3_HIGH: Tri = { zh: '超想知道！🤩', ja: 'もっと しりたい！
 
 /* ── AI Q4 ── */
 const P4: Tri = {
-  zh: '4. 看完 AI 的圖，你覺得「分類垃圾」有沒有變得更容易懂？',
-  ja: '4. AIくんの 絵（え）を みたら、「どれを 分（わ）ければ いいか」が わかりやすくなった？',
-  en: '4. After seeing the AI picture, did sorting rubbish feel easier to understand?',
+  zh: '4. 看到 AI 畫的酷圖之後，你有沒有更想選對正確的材料？',
+  ja: '4. AIくんの かっこいい 絵（え）を みたら、材料（ざいりょう）を 正（ただ）しく えらびたくなった？',
+  en: '4. Seeing the AI\'s cool picture, did it make you want to pick the right materials?',
 };
-const P4_LOW: Tri = { zh: '完全一樣 😞', ja: 'ぜんぜん 😞', en: 'No change 😞' };
-const P4_HIGH: Tri = { zh: '清楚多了！🤩', ja: 'すごく わかった！🤩', en: 'Much clearer! 🤩' };
+const P4_LOW: Tri = { zh: '完全沒有 😞', ja: 'ぜんぜん 😞', en: 'Not at all 😞' };
+const P4_HIGH: Tri = { zh: '好想選對！🤩', ja: 'えらびたい！🤩', en: 'Yes, I want to! 🤩' };
 
 /* ── AI Q5 ── */
 const P5: Tri = {
@@ -130,11 +130,11 @@ interface ToyIdea { emoji: string; material: string; color: string; bg: string; 
 const TOY_IDEAS: ToyIdea[] = [
   {
     emoji: '🌱', material: '🔵 PET', color: '#4FC3F7', bg: 'rgba(79,195,247,0.1)',
-    title: { zh: '迷你溫室', ja: 'ミニ おんしつ', en: 'Mini Terrarium' },
+    title: { zh: '迷你小花園', ja: 'ちいさな みどりの いえ', en: 'Mini Green House' },
     desc: {
-      zh: '把 PET 瓶子切開，填入泥土和小植物，做成桌上小溫室！',
-      ja: 'PETボトルを きって、つちと ちいさな しょくぶつを いれよう。じぶんだけの たくじょう おんしつ！',
-      en: 'Cut open a PET bottle, fill with soil and tiny plants — your own desktop greenhouse!',
+      zh: '把 PET 瓶子切開，填入泥土和小植物，做成桌上小花園！',
+      ja: 'PETボトルを きって、つちと ちいさな しょくぶつを いれよう。つくえの うえに かざれる、じぶんだけの みどり！',
+      en: 'Cut open a PET bottle, fill with soil and tiny plants — your own little green corner on the desk!',
     },
   },
   {
