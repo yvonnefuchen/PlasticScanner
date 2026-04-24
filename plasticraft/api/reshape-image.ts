@@ -16,6 +16,8 @@ interface JobParams {
   imageDataUrl: string | null;
   objectName: string;
   reshapeTarget: string;
+  promptStyle?: string;
+  lang?: string;
 }
 
 const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY ?? process.env.GOOGLE_API_KEY ?? '' });
@@ -85,6 +87,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         imageDataUrl: body.imageDataUrl ?? null,
         objectName: body.objectName ?? 'plastic item',
         reshapeTarget: body.reshapeTarget,
+        promptStyle: body.promptStyle,
+        lang: body.lang,
       },
     };
 
@@ -98,10 +102,32 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 type ImgPart = { inlineData?: { mimeType: string; data: string } };
 
 async function generateImage(params: JobParams): Promise<string> {
-  const prompt =
-    `Child-friendly cartoon illustration: a ${params.objectName} being recycled and creatively transformed into a ${params.reshapeTarget}. ` +
-    `Style: Bright cheerful colors, simple cute 2D vector art, educational and fun. ` +
-    `No text, no realistic photos, high contrast.`;
+  const item = params.objectName;
+  const lang = params.lang ?? 'en';
+
+  let prompt: string;
+  if (params.promptStyle === 'vehicle') {
+    const titleMap: Record<string, { title: string; sub: string }> = {
+      zh: { title: `${item}變身未來探索器大挑戰！`,             sub: `分析這個物品⋯發明你的新探索器！` },
+      ja: { title: `${item}で未来の探査機を作ろうチャレンジ！`,  sub: `この素材を分析して...新しい探索機を発明しよう！` },
+      en: { title: `${item.toUpperCase()} TO FUTURISTIC CRAFT CHALLENGE!`, sub: `Analyze the object... and invent your new explorer!` },
+    };
+    const { title, sub } = titleMap[lang] ?? titleMap['en'];
+    prompt =
+      `Create a whimsical, mixed-media blueprint conceptual art piece for a children's maker workshop. ` +
+      `Rendered in a cheerful colored-pencil and crayon style; a single clean panel on textured grid paper adorned with hand-drawn stars and planets. ` +
+      `At the top, a clearly defined input section shows a specific everyday household item precisely matching the object seen in the provided photo, alongside a stylized arrow. ` +
+      `The main central illustration presents a conceptual 'Futuristic [auto-select one of: Mars Rover, Deep-Sea Submarine, Galactic Star-Fighter, or Flying Scooter] Exploration Craft'. ` +
+      `This craft's core form is visibly constructed by upcycling the physical structure of the ${item} — e.g. a water bottle's cylinder becomes the hull; a detergent jug's handle becomes the engine intake. ` +
+      `Assembled using only kid-friendly crafting materials: colorful washi tape joints, cardboard panels, paper fins, and glue — not technical machining. ` +
+      `The object's identifiable features (colors, handles, screw caps) are preserved and repurposed. ` +
+      `A large friendly title at the bottom reads: '${title}' with smaller text: '${sub}'`;
+  } else {
+    prompt =
+      `Child-friendly cartoon illustration: a ${item} being recycled and creatively transformed into a ${params.reshapeTarget}. ` +
+      `Style: Bright cheerful colors, simple cute 2D vector art, educational and fun. ` +
+      `No text, no realistic photos, high contrast.`;
+  }
 
   type Part = { text: string } | { inlineData: { mimeType: string; data: string } };
   const parts: Part[] = [];

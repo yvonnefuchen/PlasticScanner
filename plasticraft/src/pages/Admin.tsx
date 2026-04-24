@@ -36,6 +36,9 @@ function downloadCSV() {
 
 export default function Admin() {
   const [sessions, setSessions] = useState<SurveySession[]>(() => getSessions());
+  const [imgStyle, setImgStyle] = useState<'auto' | 'vehicle'>(
+    () => (localStorage.getItem('plasticraft_img_style') as 'auto' | 'vehicle') ?? 'auto'
+  );
 
   const completed = sessions.filter(s => s.post !== null);
   const q5Ratings = sessions.map(s => s.pre.q5_separate_habit).filter(Boolean);
@@ -45,6 +48,10 @@ export default function Admin() {
   const s3q9Ratings = completed.map(s => s.post!.s3q9_melting_point);
 
   const refresh = () => setSessions(getSessions());
+  const handleStyleChange = (s: 'auto' | 'vehicle') => {
+    localStorage.setItem('plasticraft_img_style', s);
+    setImgStyle(s);
+  };
 
   return (
     <div className="admin-page">
@@ -53,6 +60,22 @@ export default function Admin() {
         <div style={{ display: 'flex', gap: 10 }}>
           <button className="admin-csv-btn" onClick={refresh}>↻ Refresh</button>
           <button className="admin-csv-btn" onClick={downloadCSV}>⬇ Export CSV</button>
+        </div>
+      </div>
+
+      {/* Image generation mode toggle */}
+      <div className="admin-settings">
+        <span className="admin-settings__label">🖼️ Image Generation Mode</span>
+        <div className="admin-settings__btns">
+          {(['auto', 'vehicle'] as const).map(s => (
+            <button
+              key={s}
+              className={`admin-settings__btn${imgStyle === s ? ' admin-settings__btn--active' : ''}`}
+              onClick={() => handleStyleChange(s)}
+            >
+              {s === 'auto' ? '🎴 Automatic suggestions' : '🚀 Reshape to futuristic vehicle'}
+            </button>
+          ))}
         </div>
       </div>
 

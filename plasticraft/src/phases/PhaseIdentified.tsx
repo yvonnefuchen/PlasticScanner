@@ -63,6 +63,18 @@ export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, o
   const pick = <T,>(zh: T, ja: T, en: T) =>
     lang === 'zh' ? zh : lang === 'ja' ? ja : en;
 
+  const imgStyle = (localStorage.getItem('plasticraft_img_style') as 'auto' | 'vehicle') ?? 'auto';
+
+  const reshapeRequests = !obj?.reshape_suggestions?.length ? [] :
+    imgStyle === 'vehicle'
+      ? [{ reshapeTarget: 'futuristic exploration craft', emoji: '🚀',
+           label: pick('未來探索器', '未来の探査機', 'Futuristic Craft') }]
+      : obj.reshape_suggestions.slice(0, 3).map(s => ({
+          reshapeTarget: s.image_search_query,
+          emoji: s.emoji ?? '♻️',
+          label: pick(s.item_zh, s.item_ja, s.item_en),
+        }));
+
   const objectName   = obj ? pick(obj.object_name_zh,   obj.object_name_ja,   obj.object_name_en)   : null;
   const materialFull = obj ? pick(obj.material_full_zh,  obj.material_full_ja,  obj.material_full_en)  : null;
   const charMessage  = obj ? pick(obj.character_message_zh, obj.character_message_ja, obj.character_message_en) : null;
@@ -181,20 +193,17 @@ export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, o
         </motion.div>
 
         {/* Reshape ideas + images */}
-        {obj?.reshape_suggestions?.length && (
+        {reshapeRequests.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} style={{ width: '100%', maxWidth: 480 }}>
             <p style={{ textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)', margin: '0 0 10px' }}>
               ♻️ <T s={RESHAPE_TITLE} />
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-              {obj.reshape_suggestions.slice(0, 3).map((s, i) => {
-                const label = pick(s.item_zh, s.item_ja, s.item_en);
-                return (
-                  <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 + i * 0.15 }} style={{ flex: '1 1 0', minWidth: 0 }}>
-                    <ReshapeCard sourceImage={capturedImage ?? null} objectName={obj.object_name_en} reshape={s.image_search_query} emoji={s.emoji ?? '♻️'} label={label} color={plastic.color} />
-                  </motion.div>
-                );
-              })}
+              {reshapeRequests.map((r, i) => (
+                <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 + i * 0.15 }} style={{ flex: '1 1 0', minWidth: 0 }}>
+                  <ReshapeCard sourceImage={capturedImage ?? null} objectName={obj!.object_name_en} reshape={r.reshapeTarget} emoji={r.emoji} label={r.label} color={plastic.color} lang={lang} />
+                </motion.div>
+              ))}
             </div>
           </motion.div>
         )}
@@ -251,20 +260,17 @@ export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, o
         </motion.div>
 
         {/* Reshape suggestions using scan data */}
-        {obj?.reshape_suggestions?.length && (
+        {reshapeRequests.length > 0 && (
           <motion.div initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }} style={{ width: '100%', maxWidth: 480 }}>
             <p style={{ textAlign: 'center', fontSize: '0.85rem', fontWeight: 700, color: 'var(--text)', margin: '0 0 10px' }}>
               ♻️ <T s={RESHAPE_TITLE} />
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-              {obj.reshape_suggestions.slice(0, 3).map((s, i) => {
-                const label = pick(s.item_zh, s.item_ja, s.item_en);
-                return (
-                  <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.15 }} style={{ flex: '1 1 0', minWidth: 0 }}>
-                    <ReshapeCard sourceImage={capturedImage ?? null} objectName={obj.object_name_en} reshape={s.image_search_query} emoji={s.emoji ?? '♻️'} label={label} color={confirmed.color} />
-                  </motion.div>
-                );
-              })}
+              {reshapeRequests.map((r, i) => (
+                <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.15 }} style={{ flex: '1 1 0', minWidth: 0 }}>
+                  <ReshapeCard sourceImage={capturedImage ?? null} objectName={obj!.object_name_en} reshape={r.reshapeTarget} emoji={r.emoji} label={r.label} color={confirmed.color} lang={lang} />
+                </motion.div>
+              ))}
             </div>
           </motion.div>
         )}
@@ -367,13 +373,14 @@ export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, o
 }
 
 /* Image card — sends original photo + reshape target to /api/reshape-image; silently falls back to emoji on failure */
-function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color }: {
+function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color, lang }: {
   sourceImage: string | null;
   objectName: string;
   reshape: string;
   emoji: string;
   label: string;
   color: string;
+  lang: string;
 }) {
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [imgFailed, setImgFailed] = useState(false);
@@ -393,7 +400,13 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color }: 
         const res = await fetch('/api/reshape-image', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ imageDataUrl: smallImage, objectName, reshapeTarget: reshape }),
+          body: JSON.stringify({
+            imageDataUrl: smallImage,
+            objectName,
+            reshapeTarget: reshape,
+            promptStyle: localStorage.getItem('plasticraft_img_style') ?? 'auto',
+            lang,
+          }),
         });
         const data = await res.json() as { jobId?: string; error?: string };
         if (cancelled) return;
@@ -425,7 +438,7 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color }: 
       clearTimeout(startTimer);
       if (pollId) clearInterval(pollId);
     };
-  }, [objectName, reshape]);
+  }, [objectName, reshape, lang]);
 
   const showEmoji = !imgUrl || imgFailed;
 
