@@ -453,7 +453,7 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color, la
         fontSize: '2.4rem', position: 'relative',
       }}>
         {imgUrl && !imgFailed ? (
-          <img src={imgUrl} alt={label} style={{ width: '100%', height: '100%', objectFit: 'cover', display: 'block' }} onError={() => setImgFailed(true)} />
+          <img src={imgUrl} alt={label} style={{ width: '100%', height: '100%', objectFit: 'contain', display: 'block' }} onError={() => setImgFailed(true)} />
         ) : loading ? (
           <>
             <motion.div
