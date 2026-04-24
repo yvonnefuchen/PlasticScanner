@@ -153,6 +153,7 @@ function AppInner() {
               scanData={scanData}
               scanError={scanError}
               capturedImage={capturedImage}
+              sessionId={sessionId}
               onNext={() => setPhase('quiz')}
               onRetry={() => setPhase('scanning')}
               onOverride={(id) => { setIdentifiedId(id); setPhase('quiz'); }}

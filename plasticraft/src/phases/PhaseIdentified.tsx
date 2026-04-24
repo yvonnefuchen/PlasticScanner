@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { PlasticMascot } from '../components/PlasticMascot';
 import { T } from '../components/T';
@@ -7,12 +7,14 @@ import type { PlasticId, PlasticType } from '../data/plastics';
 import { PLASTICS } from '../data/plastics';
 import type { ScanData } from '../services/scanner';
 import { resizeImage } from '../services/scanner';
+import { saveAiImage } from '../services/survey';
 
 interface Props {
   plastic: PlasticType;
   scanData?: ScanData | null;
   scanError?: string | null;
   capturedImage?: string | null;
+  sessionId?: string | null;
   onNext: () => void;
   onRetry?: () => void;
   onOverride?: (id: PlasticId) => void;
@@ -46,9 +48,10 @@ const LABEL_OPTIONS: Array<{ id: PlasticId; code: string; color: string; emoji: 
   { id: 'PS',  code: 'PS',  color: '#FFAB40', emoji: '🟠' },
 ];
 
-export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, onNext, onRetry, onOverride }: Props) {
+export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, sessionId, onNext, onRetry, onOverride }: Props) {
   const { lang } = useLang();
   const [showDebug, setShowDebug] = useState(false);
+  const aiImageSavedRef = useRef(false);
 
   const uncertainty = scanData?.uncertainty_prompt ?? null;
   const obj         = scanData?.detected_objects?.[0] ?? null;
@@ -201,7 +204,7 @@ export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, o
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
               {reshapeRequests.map((r, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.6 + i * 0.15 }} style={{ flex: '1 1 0', minWidth: 0 }}>
-                  <ReshapeCard sourceImage={capturedImage ?? null} objectName={obj!.object_name_en} reshape={r.reshapeTarget} emoji={r.emoji} label={r.label} color={plastic.color} lang={lang} />
+                  <ReshapeCard sourceImage={capturedImage ?? null} objectName={obj!.object_name_en} reshape={r.reshapeTarget} emoji={r.emoji} label={r.label} color={plastic.color} lang={lang} sessionId={sessionId} onImageSaved={() => { aiImageSavedRef.current = true; }} />
                 </motion.div>
               ))}
             </div>
@@ -373,7 +376,7 @@ export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, o
 }
 
 /* Image card — sends original photo + reshape target to /api/reshape-image; silently falls back to emoji on failure */
-function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color, lang }: {
+function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color, lang, sessionId, onImageSaved }: {
   sourceImage: string | null;
   objectName: string;
   reshape: string;
@@ -381,6 +384,8 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color, la
   label: string;
   color: string;
   lang: string;
+  sessionId?: string | null;
+  onImageSaved?: () => void;
 }) {
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [imgFailed, setImgFailed] = useState(false);
@@ -426,7 +431,10 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color, la
           if (data.status === 'done' || data.status === 'error') {
             clearInterval(pollId!);
             setLoading(false);
-            if (data.url) setImgUrl(data.url);
+            if (data.url) {
+              setImgUrl(data.url);
+              if (sessionId) { saveAiImage(sessionId, data.url); onImageSaved?.(); }
+            }
             else if (data.error) setDebugMsg(data.error);
           }
         } catch { /* keep polling */ }

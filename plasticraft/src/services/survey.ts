@@ -25,6 +25,7 @@ export interface SurveySession {
   pre: PreSurvey;
   post: PostSurvey | null;
   photoUrl?: string;
+  aiImageUrl?: string;
 }
 
 const KEY = 'plasticraft_surveys';
@@ -63,6 +64,15 @@ export function savePhoto(id: string, photoUrl: string): void {
   const session = all.find(s => s.id === id);
   if (session) {
     session.photoUrl = photoUrl;
+    persist(all);
+  }
+}
+
+export function saveAiImage(id: string, aiImageUrl: string): void {
+  const all = load();
+  const session = all.find(s => s.id === id);
+  if (session && !session.aiImageUrl) {
+    session.aiImageUrl = aiImageUrl;
     persist(all);
   }
 }

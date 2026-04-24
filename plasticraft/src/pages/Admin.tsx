@@ -130,6 +130,7 @@ export default function Admin() {
                 <th>#</th>
                 <th>Time</th>
                 <th>Photo</th>
+                <th>AI Image</th>
                 {/* Pre */}
                 {/* Pre */}
                 <th>Pre Q1 Sort 😊</th>
@@ -170,6 +171,11 @@ export default function Admin() {
                   <td>
                     {s.photoUrl
                       ? <img src={s.photoUrl} alt="car" className="admin-photo" />
+                      : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
+                  </td>
+                  <td>
+                    {s.aiImageUrl
+                      ? <img src={s.aiImageUrl} alt="AI" className="admin-photo" />
                       : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
                   </td>
                   {/* Pre */}
