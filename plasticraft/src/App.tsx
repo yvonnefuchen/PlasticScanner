@@ -107,7 +107,10 @@ function AppInner() {
       <AnimatePresence mode="wait">
         {phase === 'idle' && (
           <PageWrap key="idle">
-            <PhaseIdle onStart={() => setPhase('survey-pre')} />
+            <PhaseIdle onStart={() => {
+                const isTest = localStorage.getItem('plasticraft_app_mode') === 'testing';
+                setPhase(isTest ? 'scanning' : 'survey-pre');
+              }} />
           </PageWrap>
         )}
 

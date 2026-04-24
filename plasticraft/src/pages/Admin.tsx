@@ -39,6 +39,9 @@ export default function Admin() {
   const [imgStyle, setImgStyle] = useState<'auto' | 'vehicle'>(
     () => (localStorage.getItem('plasticraft_img_style') as 'auto' | 'vehicle') ?? 'auto'
   );
+  const [appMode, setAppMode] = useState<'production' | 'testing'>(
+    () => (localStorage.getItem('plasticraft_app_mode') as 'production' | 'testing') ?? 'production'
+  );
 
   const completed = sessions.filter(s => s.post !== null);
   const q5Ratings = sessions.map(s => s.pre.q5_separate_habit).filter(Boolean);
@@ -51,6 +54,10 @@ export default function Admin() {
   const handleStyleChange = (s: 'auto' | 'vehicle') => {
     localStorage.setItem('plasticraft_img_style', s);
     setImgStyle(s);
+  };
+  const handleModeChange = (m: 'production' | 'testing') => {
+    localStorage.setItem('plasticraft_app_mode', m);
+    setAppMode(m);
   };
 
   return (
@@ -77,6 +84,27 @@ export default function Admin() {
             </button>
           ))}
         </div>
+      </div>
+
+      {/* App mode toggle */}
+      <div className="admin-settings">
+        <span className="admin-settings__label">⚙️ App Mode</span>
+        <div className="admin-settings__btns">
+          {(['production', 'testing'] as const).map(m => (
+            <button
+              key={m}
+              className={`admin-settings__btn${appMode === m ? ' admin-settings__btn--active' : ''}`}
+              onClick={() => handleModeChange(m)}
+            >
+              {m === 'production' ? '🏭 Production' : '🔬 Testing'}
+            </button>
+          ))}
+        </div>
+        {appMode === 'testing' && (
+          <span style={{ fontSize: '0.75rem', color: '#FFAB40', marginLeft: 4 }}>
+            Skips surveys — jumps straight to scanner
+          </span>
+        )}
       </div>
 
       {/* Stats */}
