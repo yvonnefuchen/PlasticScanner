@@ -132,6 +132,7 @@ export default function Admin() {
           <table className="admin-table">
             <thead>
               <tr>
+                <th></th>
                 <th>#</th>
                 <th>Time</th>
                 <th>Photo</th>
@@ -159,12 +160,24 @@ export default function Admin() {
                 <th>Post S4Q10</th>
                 <th>Post S4Q11 ★</th>
                 <th>Post S4Q12 Open</th>
-                <th></th>
               </tr>
             </thead>
             <tbody>
               {sessions.map((s, i) => (
                 <tr key={s.id}>
+                  <td>
+                    <button
+                      onClick={() => { deleteSession(s.id); refresh(); }}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        color: 'rgba(239,83,80,0.6)', fontSize: '1rem', padding: '2px 6px',
+                        borderRadius: 6, lineHeight: 1,
+                      }}
+                      title="Delete entry"
+                    >
+                      🗑️
+                    </button>
+                  </td>
                   <td style={{ color: 'rgba(240,244,255,0.4)', fontSize: '0.75rem' }}>{i + 1}</td>
                   <td style={{ color: 'rgba(240,244,255,0.5)', fontSize: '0.75rem' }}>
                     {new Date(s.timestamp).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
@@ -198,19 +211,6 @@ export default function Admin() {
                   <Cell v={s.post?.s4q10_ironing} correct={s.post ? s.post.s4q10_ironing === 'A' : null} />
                   <td>{stars(s.post?.s4q11_keychain)}</td>
                   <Trunc v={s.post?.s4q12_open} />
-                  <td>
-                    <button
-                      onClick={() => { deleteSession(s.id); refresh(); }}
-                      style={{
-                        background: 'none', border: 'none', cursor: 'pointer',
-                        color: 'rgba(239,83,80,0.6)', fontSize: '1rem', padding: '2px 6px',
-                        borderRadius: 6, lineHeight: 1,
-                      }}
-                      title="Delete entry"
-                    >
-                      🗑️
-                    </button>
-                  </td>
                 </tr>
               ))}
             </tbody>
