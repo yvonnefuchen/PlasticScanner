@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { getSessions, exportCSV, type SurveySession } from '../services/survey';
+import { getSessions, exportCSV, deleteSession, type SurveySession } from '../services/survey';
 
 function avg(nums: number[]): string {
   if (nums.length === 0) return '—';
@@ -159,6 +159,7 @@ export default function Admin() {
                 <th>Post S4Q10</th>
                 <th>Post S4Q11 ★</th>
                 <th>Post S4Q12 Open</th>
+                <th></th>
               </tr>
             </thead>
             <tbody>
@@ -197,6 +198,19 @@ export default function Admin() {
                   <Cell v={s.post?.s4q10_ironing} correct={s.post ? s.post.s4q10_ironing === 'A' : null} />
                   <td>{stars(s.post?.s4q11_keychain)}</td>
                   <Trunc v={s.post?.s4q12_open} />
+                  <td>
+                    <button
+                      onClick={() => { deleteSession(s.id); refresh(); }}
+                      style={{
+                        background: 'none', border: 'none', cursor: 'pointer',
+                        color: 'rgba(239,83,80,0.6)', fontSize: '1rem', padding: '2px 6px',
+                        borderRadius: 6, lineHeight: 1,
+                      }}
+                      title="Delete entry"
+                    >
+                      🗑️
+                    </button>
+                  </td>
                 </tr>
               ))}
             </tbody>

@@ -81,6 +81,10 @@ export function getSessions(): SurveySession[] {
   return load();
 }
 
+export function deleteSession(id: string): void {
+  persist(load().filter(s => s.id !== id));
+}
+
 export function exportCSV(): string {
   const all = load();
   const headers = [
