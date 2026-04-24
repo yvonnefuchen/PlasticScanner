@@ -8,7 +8,7 @@ declare const process: { env: Record<string, string | undefined> };
 
 type JobState =
   | { status: 'pending'; params: JobParams }
-  | { status: 'generating' }
+  | { status: 'generating'; params: JobParams; startedAt: number }
   | { status: 'done'; url: string }
   | { status: 'error'; error: string };
 
@@ -54,12 +54,17 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     const job = await redis.get<JobState>(`job:${jobId}`);
     if (!job) return json(res, 404, { error: 'Job not found' });
 
-    if (job.status === 'done' || job.status === 'error' || job.status === 'generating') {
+    if (job.status === 'done' || job.status === 'error') {
       return json(res, 200, job);
     }
+    /* If stuck generating for >90s (prior function timeout), reset to pending */
+    if (job.status === 'generating') {
+      if (Date.now() - job.startedAt < 90_000) return json(res, 200, { status: 'pending' });
+      /* fell through — treat as retriable */
+    }
 
-    /* status === 'pending': this GET triggers generation */
-    await redis.set(`job:${jobId}`, { status: 'generating' }, { ex: 300 });
+    /* status === 'pending' (or stale generating): this GET triggers generation */
+    await redis.set(`job:${jobId}`, { status: 'generating', params: job.params, startedAt: Date.now() }, { ex: 300 });
 
     try {
       const imageUrl = await generateImage(job.params);
@@ -139,11 +144,18 @@ async function generateImage(params: JobParams): Promise<string> {
   }
   parts.push({ text: prompt });
 
-  const result = await ai.models.generateContent({
-    model: 'models/gemini-3.1-flash-image-preview',
-    config: { responseModalities: ['IMAGE'] },
-    contents: [{ role: 'user', parts }],
-  });
+  const abort = new AbortController();
+  const timer = setTimeout(() => abort.abort(), 50_000);
+  let result;
+  try {
+    result = await ai.models.generateContent({
+      model: 'models/gemini-2.0-flash-preview-image-generation',
+      config: { responseModalities: ['IMAGE'], abortSignal: abort.signal },
+      contents: [{ role: 'user', parts }],
+    });
+  } finally {
+    clearTimeout(timer);
+  }
 
   for (const part of (result.candidates?.[0]?.content?.parts ?? []) as ImgPart[]) {
     if (part.inlineData) {
