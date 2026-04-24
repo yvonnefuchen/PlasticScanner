@@ -591,6 +591,26 @@ html, body {
 .star-btn:hover { transform: scale(1.18); color: rgba(240,244,255,0.5); }
 .star-btn--on { color: #FFD54F; text-shadow: 0 0 8px rgba(255,213,79,0.6); }
 
+.emoji-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  justify-content: center;
+}
+.emoji-btn {
+  background: none;
+  border: 2px solid transparent;
+  font-size: 1.9rem;
+  cursor: pointer;
+  line-height: 1;
+  padding: 4px 6px;
+  border-radius: 10px;
+  transition: transform 0.12s, border-color 0.12s;
+  opacity: 0.35;
+}
+.emoji-btn:hover { transform: scale(1.22); opacity: 0.75; }
+.emoji-btn--on { opacity: 1; border-color: var(--primary); transform: scale(1.12); }
+
 .star-labels-row {
   display: flex;
   width: 100%;

@@ -18,10 +18,6 @@ function Cell({ v, correct }: { v: string | undefined; correct?: boolean | null 
   return <td>{v}</td>;
 }
 
-function Trunc({ v }: { v: string | undefined }) {
-  if (!v) return <td className="cell-empty">—</td>;
-  return <td style={{ maxWidth: 120, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontSize: '0.75rem', color: 'rgba(240,244,255,0.6)' }} title={v}>{v}</td>;
-}
 
 function downloadCSV() {
   const csv = exportCSV();
@@ -44,11 +40,10 @@ export default function Admin() {
   );
 
   const completed = sessions.filter(s => s.post !== null);
-  const q5Ratings = sessions.map(s => s.pre.q5_separate_habit).filter(Boolean);
-  const q6Ratings = sessions.map(s => s.pre.q6_confidence).filter(Boolean);
-  const s2q5Ratings = completed.map(s => s.post!.s2q5_plan_separate);
-  const s3q8Ratings = completed.map(s => s.post!.s3q8_ai_helped);
-  const s3q9Ratings = completed.map(s => s.post!.s3q9_melting_point);
+  const q1Ratings = sessions.map(s => s.pre.q1_sort_habit).filter(Boolean);
+  const p3Ratings = completed.map(s => s.post!.p3_ai_interest);
+  const p4Ratings = completed.map(s => s.post!.p4_ai_clarity);
+  const p5Ratings = completed.map(s => s.post!.p5_ai_achievement);
 
   const refresh = () => setSessions(getSessions());
   const handleStyleChange = (s: 'auto' | 'vehicle') => {
@@ -112,11 +107,10 @@ export default function Admin() {
         {[
           { label: 'Total Sessions', value: sessions.length },
           { label: 'Completed Post-Survey', value: `${completed.length} (${sessions.length ? Math.round(completed.length / sessions.length * 100) : 0}%)` },
-          { label: 'Pre: Avg Separate Habit ★', value: avg(q5Ratings) },
-          { label: 'Pre: Avg Confidence ★', value: avg(q6Ratings) },
-          { label: 'Post: Avg Plan Separate ★', value: avg(s2q5Ratings) },
-          { label: 'Post: Avg AI Helped ★', value: avg(s3q8Ratings) },
-          { label: 'Post: Avg Melting Point ★', value: avg(s3q9Ratings) },
+          { label: 'Pre: Avg Sort Habit 😊', value: avg(q1Ratings) },
+          { label: 'Post: Avg AI Interest 😊', value: avg(p3Ratings) },
+          { label: 'Post: Avg AI Clarity 😊', value: avg(p4Ratings) },
+          { label: 'Post: Avg AI Achievement 😊', value: avg(p5Ratings) },
         ].map(s => (
           <div key={s.label} className="admin-stat">
             <div className="admin-stat__value">{s.value}</div>
@@ -137,29 +131,20 @@ export default function Admin() {
                 <th>Time</th>
                 <th>Photo</th>
                 {/* Pre */}
-                <th>Pre Q1 Cap</th>
-                <th>Pre Q2 Mat</th>
-                <th>Pre Q3 Why</th>
-                <th>Pre Q4 Bin</th>
-                <th>Pre Q5 ★</th>
-                <th>Pre Q6 ★</th>
-                <th>Pre Q7 Open</th>
-                {/* Post S1 */}
-                <th>Post S1Q1</th>
-                <th>Post S1Q2</th>
-                <th>Post S1Q3</th>
-                <th>Post S1Q4</th>
-                {/* Post S2 */}
-                <th>Post S2Q5 ★</th>
-                <th>Post S2Q6 ★</th>
-                <th>Post S2Q7 Open</th>
-                {/* Post S3 */}
-                <th>Post S3Q8 ★</th>
-                <th>Post S3Q9 ★</th>
-                {/* Post S4 */}
-                <th>Post S4Q10</th>
-                <th>Post S4Q11 ★</th>
-                <th>Post S4Q12 Open</th>
+                {/* Pre */}
+                <th>Pre Q1 Sort 😊</th>
+                <th>Pre Q2 Marks</th>
+                <th>Pre Q3 Cap</th>
+                {/* Post Knowledge */}
+                <th>Post P1 Mat</th>
+                <th>Post P2 Mix</th>
+                {/* Post AI */}
+                <th>Post P3 AI Interest 😊</th>
+                <th>Post P4 AI Clarity 😊</th>
+                <th>Post P5 AI Proud 😊</th>
+                {/* Post Action */}
+                <th>Post P6 Sort 😊</th>
+                <th>Post P7 Fun 😊</th>
               </tr>
             </thead>
             <tbody>
@@ -188,29 +173,19 @@ export default function Admin() {
                       : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
                   </td>
                   {/* Pre */}
-                  <Cell v={s.pre.q1_cap_disposal} correct={s.pre.q1_cap_disposal === 'B' ? true : false} />
-                  <Cell v={s.pre.q2_cap_material} correct={s.pre.q2_cap_material === 'B' ? true : false} />
-                  <Cell v={s.pre.q3_why_separate} correct={s.pre.q3_why_separate === 'B' ? true : false} />
-                  <Cell v={s.pre.q4_japan_bin} correct={s.pre.q4_japan_bin === 'B' ? true : false} />
-                  <td>{stars(s.pre.q5_separate_habit)}</td>
-                  <td>{stars(s.pre.q6_confidence)}</td>
-                  <Trunc v={s.pre.q7_open} />
-                  {/* Post S1 */}
-                  <Cell v={s.post?.s1q1_main_reason} correct={s.post ? s.post.s1q1_main_reason === 'B' : null} />
-                  <Cell v={s.post?.s1q2_cap_material} correct={s.post ? s.post.s1q2_cap_material === 'C' : null} />
-                  <Cell v={s.post?.s1q3_contamination} correct={s.post ? s.post.s1q3_contamination === 'B' : null} />
-                  <Cell v={s.post?.s1q4_japan_bin} correct={s.post ? s.post.s1q4_japan_bin === 'B' : null} />
-                  {/* Post S2 */}
-                  <td>{stars(s.post?.s2q5_plan_separate)}</td>
-                  <td>{stars(s.post?.s2q6_confidence)}</td>
-                  <Trunc v={s.post?.s2q7_open} />
-                  {/* Post S3 */}
-                  <td>{stars(s.post?.s3q8_ai_helped)}</td>
-                  <td>{stars(s.post?.s3q9_melting_point)}</td>
-                  {/* Post S4 */}
-                  <Cell v={s.post?.s4q10_ironing} correct={s.post ? s.post.s4q10_ironing === 'A' : null} />
-                  <td>{stars(s.post?.s4q11_keychain)}</td>
-                  <Trunc v={s.post?.s4q12_open} />
+                  <td>{stars(s.pre.q1_sort_habit)}</td>
+                  <Cell v={s.pre.q2_seen_marks} correct={null} />
+                  <Cell v={s.pre.q3_cap_behavior} correct={s.pre.q3_cap_behavior === 'B' ? true : false} />
+                  {/* Post Knowledge */}
+                  <Cell v={s.post?.p1_cap_material} correct={s.post ? s.post.p1_cap_material === 'B' : null} />
+                  <Cell v={s.post?.p2_mix_result} correct={s.post ? s.post.p2_mix_result === 'B' : null} />
+                  {/* Post AI */}
+                  <td>{stars(s.post?.p3_ai_interest)}</td>
+                  <td>{stars(s.post?.p4_ai_clarity)}</td>
+                  <td>{stars(s.post?.p5_ai_achievement)}</td>
+                  {/* Post Action */}
+                  <td>{stars(s.post?.p6_sort_intention)}</td>
+                  <td>{stars(s.post?.p7_fun)}</td>
                 </tr>
               ))}
             </tbody>

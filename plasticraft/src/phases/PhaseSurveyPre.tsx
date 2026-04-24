@@ -1,9 +1,8 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { T } from '../components/T';
-import { StarRating } from '../components/StarRating';
+import { EmojiRating } from '../components/EmojiRating';
 import { PlasticMascot } from '../components/PlasticMascot';
-import { useLang } from '../context/LangContext';
 import { savePre, type McChoice } from '../services/survey';
 import type { Tri } from '../data/plastics';
 
@@ -12,78 +11,105 @@ interface Props {
 }
 
 type PreAnswers = {
-  q1: McChoice | null;
+  q1: number;
   q2: McChoice | null;
   q3: McChoice | null;
-  q4: McChoice | null;
-  q5: number;
-  q6: number;
-  q7: string;
 };
 
-const MC_VALS: McChoice[] = ['A', 'B', 'C', 'D'];
-
 /* ── Strings ── */
-const TITLE: Tri = { zh: '開始前，幾個小問題！', ja: '始める前に、ちょっとした質問！', en: 'A Few Quick Questions First!' };
-const BUBBLE: Tri = { zh: '餵我之前，先讓我了解你一下！', ja: '食べさせる前に、少し教えて！', en: 'Before you feed me, tell me a little about yourself!' };
-const SUBMIT: Tri = { zh: '送出，開始掃描！', ja: '送信してスキャン開始！', en: 'Submit & Start Scanning!' };
-const AI_PREVIEW: Tri = { zh: '掃描前，先讓我展示一下我的能力！', ja: 'スキャン前に、僕の能力を見てみよう！', en: "Before scanning, let's see what I am capable of!" };
+const TITLE: Tri = {
+  zh: '🗺️ 作戰前的祕密任務！',
+  ja: '🗺️ さくせん カード！ スタート まえの ひみつ ちょうさ！',
+  en: '🗺️ Mission Card — Secret Survey Before We Start!',
+};
+const BUBBLE: Tri = {
+  zh: '嗨！先告訴我你知道什麼，我才能更好地幫你！',
+  ja: 'やあ！まず きみの こと おしえて！もっと うまく てつだえるよ！',
+  en: "Hi! Tell me what you know — I'll be a better helper!",
+};
+const SUBMIT: Tri = {
+  zh: '送出，開始任務！🚀',
+  ja: 'そうしん して、さくせん かいし！🚀',
+  en: 'Submit & Start the Mission! 🚀',
+};
+const AI_PREVIEW: Tri = {
+  zh: '掃描前，先讓我展示一下我的能力！',
+  ja: 'スキャン まえに、ぼくの のうりょくを みてみよう！',
+  en: "Before scanning, let's see what I am capable of!",
+};
 
-const Q1: Tri = { zh: '1. 丟棄塑膠瓶時，瓶蓋應該怎麼處理？', ja: '1. プラスチックボトルを捨てるとき、キャップはどうする？', en: '1. When you throw away a plastic bottle, what should you do with the cap?' };
-const Q1_OPTS: Tri[] = [
-  { zh: 'A) 留在瓶子上',    ja: 'A) そのまま付けておく', en: 'A) Leave it on' },
-  { zh: 'B) 從瓶身分開',    ja: 'B) ボトルから外す',     en: 'B) Separate it from the bottle' },
-  { zh: 'C) 丟進一般垃圾',  ja: 'C) 一般ゴミに捨てる',   en: 'C) Throw in general rubbish' },
-  { zh: 'D) 沒關係',        ja: 'D) どちらでもいい',      en: "D) Doesn't matter" },
-];
+/* Q1 */
+const Q1: Tri = {
+  zh: '1. 你平常在家有分類垃圾嗎？',
+  ja: '1. おうちで ゴミを 種類（しゅるい）ごとに 分（わ）けてる？',
+  en: '1. Do you sort your rubbish at home?',
+};
+const Q1_LOW: Tri = { zh: '從來沒有 😞', ja: 'ぜんぜん 😞', en: 'Never 😞' };
+const Q1_HIGH: Tri = { zh: '每次都有！🤩', ja: 'いつも してるよ！🤩', en: 'Always! 🤩' };
 
-const Q2: Tri = { zh: '2. 瓶蓋通常是哪種材料？', ja: '2. ボトルのキャップは通常どの素材？', en: '2. Bottle caps are usually made of which material?' };
-const Q2_OPTS: Tri[] = [
-  { zh: 'A) PET',   ja: 'A) PET',   en: 'A) PET' },
-  { zh: 'B) PP',    ja: 'B) PP',    en: 'B) PP' },
-  { zh: 'C) 玻璃',  ja: 'C) ガラス', en: 'C) Glass' },
-  { zh: 'D) 鋁',    ja: 'D) アルミ', en: 'D) Aluminium' },
-];
+/* Q2 */
+const Q2: Tri = {
+  zh: '2. 你看過這些「神祕符號」嗎？',
+  ja: '2. このマーク、見（み）たことある？',
+  en: '2. Have you seen these marks before?',
+};
+const Q2_A: Tri = { zh: '🅰️ 見過！有！', ja: '🅰️ ある！', en: '🅰️ Yes!' };
+const Q2_B: Tri = { zh: '🅱️ 還沒看過', ja: '🅱️ まだない', en: '🅱️ Not yet' };
 
-const Q3: Tri = { zh: '3. 為什麼某些塑膠在回收前需要分開？', ja: '3. なぜ一部のプラスチックはリサイクル前に分ける必要があるの？', en: '3. Why do some plastics need to be separated before recycling?' };
-const Q3_OPTS: Tri[] = [
-  { zh: 'A) 顏色不同',     ja: 'A) 色が違うから',         en: 'A) Different colours' },
-  { zh: 'B) 融化溫度不同', ja: 'B) 溶ける温度が違うから',  en: 'B) Different melting temperatures' },
-  { zh: 'C) 重量不同',     ja: 'C) 重さが違うから',        en: 'C) Different weights' },
-  { zh: 'D) 工廠空間問題', ja: 'D) 工場のスペースの問題',  en: 'D) Factory space' },
-];
+/* Q3 */
+const Q3: Tri = {
+  zh: '3. 喝完飲料，瓶蓋你怎麼丟？',
+  ja: '3. のみものを のんだあと、キャップは どうする？',
+  en: '3. After drinking, what do you do with the bottle cap?',
+};
+const Q3_A: Tri = { zh: '🅰️ 蓋著一起丟', ja: '🅰️ つけたまま すてる', en: '🅰️ Keep it on the bottle' };
+const Q3_B: Tri = { zh: '🅱️ 拿下來分開丟', ja: '🅱️ はずして すてる', en: '🅱️ Take it off separately' };
+const Q3_C: Tri = { zh: '🅾️ 我不確定耶', ja: '🅾️ よく わからない', en: '🅾️ I\'m not sure' };
 
-const Q4: Tri = { zh: '4. 在日本，塑膠瓶蓋應放進哪個垃圾桶？', ja: '4. 日本では、プラスチックキャップはどのゴミ箱に？', en: '4. In Japan, which bin does a plastic bottle cap go into?' };
-const Q4_OPTS: Tri[] = [
-  { zh: 'A) PETボトル',    ja: 'A) PETボトル',    en: 'A) PETボトル bin' },
-  { zh: 'B) プラスチック', ja: 'B) プラスチック', en: 'B) プラスチック bin' },
-  { zh: 'C) 燃えるゴミ',   ja: 'C) 燃えるゴミ',   en: 'C) 燃えるゴミ bin' },
-  { zh: 'D) 哪個都可以',   ja: 'D) どのゴミ箱でも', en: 'D) Any bin' },
-];
+/* ── Mark badge visual ── */
+function MarkBadges() {
+  return (
+    <div style={{ display: 'flex', gap: 12, justifyContent: 'center', margin: '8px 0 4px' }}>
+      <div style={{
+        border: '2.5px solid #4FC3F7', borderRadius: 10, padding: '8px 16px',
+        textAlign: 'center', background: 'rgba(79,195,247,0.1)',
+      }}>
+        <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#4FC3F7', letterSpacing: 2 }}>PET</div>
+        <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)', marginTop: 2 }}>ペットボトル</div>
+      </div>
+      <div style={{
+        border: '2.5px solid #81C784', borderRadius: 10, padding: '8px 16px',
+        textAlign: 'center', background: 'rgba(129,199,132,0.1)',
+      }}>
+        <div style={{ fontSize: '1.1rem', fontWeight: 900, color: '#81C784', letterSpacing: 2 }}>プラ</div>
+        <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)', marginTop: 2 }}>PP キャップ</div>
+      </div>
+    </div>
+  );
+}
 
-const Q5: Tri = { zh: '5. 我在家裡會嘗試正確分類垃圾。', ja: '5. 家でゴミを正しく分別しようとしている。', en: '5. I try to separate rubbish correctly at home.' };
-const Q5_LOW: Tri = { zh: '從不', ja: '全然しない', en: 'Never' };
-const Q5_HIGH: Tri = { zh: '總是', ja: 'いつもする', en: 'Always' };
-
-const Q6: Tri = { zh: '6. 我有信心自己知道如何正確回收塑膠。', ja: '6. プラスチックを正しくリサイクルする方法を知っている自信がある。', en: '6. I feel confident that I know how to recycle plastic correctly.' };
-const Q6_LOW: Tri = { zh: '完全沒信心', ja: '全く自信なし', en: 'Not at all' };
-const Q6_HIGH: Tri = { zh: '非常有信心', ja: 'とても自信あり', en: 'Very confident' };
-
-const Q7: Tri = { zh: '7. 請用自己的話說說看，為什麼你認為瓶身和瓶蓋需要放進不同的回收桶？', ja: '7. 自分の言葉で：なぜボトル本体とキャップを別々のゴミ箱に入れる必要があると思う？', en: '7. In your own words, why do you think the bottle body and bottle cap need to go into different recycling bins?' };
-const Q7_PH: Tri = { zh: '在這裡寫下你的想法…', ja: 'ここに考えを書いてみよう…', en: 'Write your thoughts here…' };
-
-/* ── Sub-components ── */
-function McQuestion({ q, opts, value, onChange }: { q: Tri; opts: Tri[]; value: McChoice | null; onChange: (v: McChoice) => void }) {
+/* ── 2-option choice button ── */
+function TwoChoiceQuestion({ q, optA, optB, optC, value, onChange, extra }: {
+  q: Tri; optA: Tri; optB: Tri; optC?: Tri;
+  value: McChoice | null; onChange: (v: McChoice) => void;
+  extra?: React.ReactNode;
+}) {
+  const opts: { val: McChoice; label: Tri }[] = [
+    { val: 'A', label: optA },
+    { val: 'B', label: optB },
+    ...(optC ? [{ val: 'C' as McChoice, label: optC }] : []),
+  ];
   return (
     <div className="survey-q-block">
       <p className="survey-q-label"><T s={q} /></p>
-      <div className="choice-grid">
-        {MC_VALS.map((v, i) => (
-          <button key={v} type="button"
-            className={`choice-btn ${value === v ? 'choice-btn--selected' : ''}`}
-            onClick={() => onChange(v)}
+      {extra}
+      <div className="choice-grid" style={{ gridTemplateColumns: `repeat(${opts.length}, 1fr)` }}>
+        {opts.map(({ val, label }) => (
+          <button key={val} type="button"
+            className={`choice-btn ${value === val ? 'choice-btn--selected' : ''}`}
+            onClick={() => onChange(val)}
           >
-            <T s={opts[i]} />
+            <T s={label} />
           </button>
         ))}
       </div>
@@ -91,43 +117,19 @@ function McQuestion({ q, opts, value, onChange }: { q: Tri; opts: Tri[]; value: 
   );
 }
 
-function OpenQuestion({ q, placeholder, value, onChange }: { q: Tri; placeholder: Tri; value: string; onChange: (v: string) => void }) {
-  const { lang } = useLang();
-  return (
-    <div className="survey-q-block">
-      <p className="survey-q-label"><T s={q} /></p>
-      <textarea
-        className="survey-open-text"
-        rows={3}
-        value={value}
-        placeholder={placeholder[lang]}
-        onChange={e => onChange(e.target.value)}
-      />
-    </div>
-  );
-}
-
 /* ── Main ── */
 export function PhaseSurveyPre({ onComplete }: Props) {
-  const [answers, setAnswers] = useState<PreAnswers>({ q1: null, q2: null, q3: null, q4: null, q5: 0, q6: 0, q7: '' });
+  const [answers, setAnswers] = useState<PreAnswers>({ q1: 0, q2: null, q3: null });
   const [submitted, setSubmitted] = useState(false);
 
-  const allAnswered =
-    answers.q1 !== null && answers.q2 !== null &&
-    answers.q3 !== null && answers.q4 !== null &&
-    answers.q5 > 0 && answers.q6 > 0 &&
-    answers.q7.trim().length > 0;
+  const allAnswered = answers.q1 > 0 && answers.q2 !== null && answers.q3 !== null;
 
   const handleSubmit = () => {
     if (!allAnswered) return;
     const id = savePre({
-      q1_cap_disposal: answers.q1!,
-      q2_cap_material: answers.q2!,
-      q3_why_separate: answers.q3!,
-      q4_japan_bin: answers.q4!,
-      q5_separate_habit: answers.q5,
-      q6_confidence: answers.q6,
-      q7_open: answers.q7.trim(),
+      q1_sort_habit: answers.q1,
+      q2_seen_marks: answers.q2!,
+      q3_cap_behavior: answers.q3!,
     });
     setSubmitted(true);
     setTimeout(() => onComplete(id), 3800);
@@ -141,7 +143,6 @@ export function PhaseSurveyPre({ onComplete }: Props) {
       <AnimatePresence mode="wait">
         {submitted ? (
           <motion.div key="thanks" className="survey-thanks" initial={{ opacity: 0, scale: 0.9 }} animate={{ opacity: 1, scale: 1 }}>
-            {/* Bouncing equalizer bars — AI visualizer */}
             <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10, marginBottom: 4 }}>
               <div style={{ display: 'flex', gap: 6, alignItems: 'flex-end', height: 72 }}>
                 {([
@@ -153,14 +154,8 @@ export function PhaseSurveyPre({ onComplete }: Props) {
                   { delay: 0.34, heights: [12, 48] as [number, number] },
                   { delay: 0.08, heights: [24, 56] as [number, number] },
                 ]).map((b, i) => (
-                  <motion.div
-                    key={i}
-                    style={{
-                      width: 13,
-                      borderRadius: 4,
-                      background: `linear-gradient(to top, #6ee7f7, #6ef7a0)`,
-                      originY: 1,
-                    }}
+                  <motion.div key={i}
+                    style={{ width: 13, borderRadius: 4, background: 'linear-gradient(to top, #6ee7f7, #6ef7a0)', originY: 1 }}
                     animate={{ height: [b.heights[0], b.heights[1], b.heights[0]] }}
                     transition={{ duration: 0.72 + i * 0.04, repeat: Infinity, delay: b.delay, ease: 'easeInOut' }}
                   />
@@ -181,32 +176,31 @@ export function PhaseSurveyPre({ onComplete }: Props) {
               </div>
             </div>
 
-            <McQuestion q={Q1} opts={Q1_OPTS} value={answers.q1} onChange={v => set('q1', v)} />
-            <McQuestion q={Q2} opts={Q2_OPTS} value={answers.q2} onChange={v => set('q2', v)} />
-            <McQuestion q={Q3} opts={Q3_OPTS} value={answers.q3} onChange={v => set('q3', v)} />
-            <McQuestion q={Q4} opts={Q4_OPTS} value={answers.q4} onChange={v => set('q4', v)} />
-
+            {/* Q1: Emoji Likert */}
             <div className="survey-q-block">
-              <p className="survey-q-label"><T s={Q5} /></p>
-              <StarRating value={answers.q5} onChange={v => set('q5', v)} />
+              <p className="survey-q-label"><T s={Q1} /></p>
+              <EmojiRating value={answers.q1} onChange={v => set('q1', v)} />
               <div className="star-labels-row">
-                <span className="star-label"><T s={Q5_LOW} /></span>
-                <span className="star-label" style={{ marginLeft: 'auto' }}><T s={Q5_HIGH} /></span>
+                <span className="star-label"><T s={Q1_LOW} /></span>
+                <span className="star-label" style={{ marginLeft: 'auto' }}><T s={Q1_HIGH} /></span>
               </div>
             </div>
 
-            <div className="survey-q-block">
-              <p className="survey-q-label"><T s={Q6} /></p>
-              <StarRating value={answers.q6} onChange={v => set('q6', v)} />
-              <div className="star-labels-row">
-                <span className="star-label"><T s={Q6_LOW} /></span>
-                <span className="star-label" style={{ marginLeft: 'auto' }}><T s={Q6_HIGH} /></span>
-              </div>
-            </div>
+            {/* Q2: Seen marks */}
+            <TwoChoiceQuestion
+              q={Q2} optA={Q2_A} optB={Q2_B}
+              value={answers.q2} onChange={v => set('q2', v)}
+              extra={<MarkBadges />}
+            />
 
-            <OpenQuestion q={Q7} placeholder={Q7_PH} value={answers.q7} onChange={v => set('q7', v)} />
+            {/* Q3: Cap behavior */}
+            <TwoChoiceQuestion
+              q={Q3} optA={Q3_A} optB={Q3_B} optC={Q3_C}
+              value={answers.q3} onChange={v => set('q3', v)}
+            />
 
-            <button className="btn-primary" onClick={handleSubmit} disabled={!allAnswered} style={{ opacity: allAnswered ? 1 : 0.45, marginTop: 4 }}>
+            <button className="btn-primary" onClick={handleSubmit} disabled={!allAnswered}
+              style={{ opacity: allAnswered ? 1 : 0.45, marginTop: 4 }}>
               <T s={SUBMIT} />
             </button>
           </motion.div>
