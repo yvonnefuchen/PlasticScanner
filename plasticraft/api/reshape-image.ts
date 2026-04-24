@@ -149,8 +149,8 @@ async function generateImage(params: JobParams): Promise<string> {
   let result;
   try {
     result = await ai.models.generateContent({
-      model: 'models/gemini-2.0-flash-preview-image-generation',
-      config: { responseModalities: ['IMAGE'], abortSignal: abort.signal },
+      model: 'gemini-2.5-flash-image',
+      config: { responseModalities: ['TEXT', 'IMAGE'], abortSignal: abort.signal },
       contents: [{ role: 'user', parts }],
     });
   } finally {
