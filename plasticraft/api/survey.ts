@@ -89,7 +89,11 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
         region: req.headers['x-vercel-ip-country-region'] as string | undefined,
       };
       const surveyVersion = (body as { surveyVersion?: number })['surveyVersion'] ?? 1;
-      const { error } = await supabase.from('sessions').upsert({ id, timestamp, pre, location, survey_version: surveyVersion });
+      let { error } = await supabase.from('sessions').upsert({ id, timestamp, pre, location, survey_version: surveyVersion });
+      // PostgREST schema cache may be stale after ALTER TABLE — fall back without the new column
+      if (error?.message.includes('survey_version')) {
+        ({ error } = await supabase.from('sessions').upsert({ id, timestamp, pre, location }));
+      }
       if (error) return json(res, 500, { error: error.message });
       return json(res, 200, { ok: true });
     }

@@ -126,12 +126,21 @@ export default function Admin() {
     () => (localStorage.getItem('plasticraft_app_mode') as 'production' | 'testing') ?? 'production'
   );
 
+  const mergeSessions = (apiData: SurveySession[] | null): SurveySession[] => {
+    const local = getSessions();
+    if (!apiData) return local;
+    // API takes precedence for matching ids; append local-only sessions at the end
+    const apiIds = new Set(apiData.map(s => s.id));
+    const localOnly = local.filter(s => !apiIds.has(s.id));
+    return [...apiData, ...localOnly];
+  };
+
   useEffect(() => {
     if (!authed) return;
     setFetching(true);
     const token = loadToken();
     (token ? getSessionsFromApi(token) : Promise.resolve(null)).then(data => {
-      setSessions(data ?? getSessions());
+      setSessions(mergeSessions(data));
       setFetching(false);
     });
   }, [authed]);
@@ -142,7 +151,7 @@ export default function Admin() {
     setFetching(true);
     const token = loadToken();
     (token ? getSessionsFromApi(token) : Promise.resolve(null)).then(data => {
-      setSessions(data ?? getSessions());
+      setSessions(mergeSessions(data));
       setFetching(false);
     });
   };

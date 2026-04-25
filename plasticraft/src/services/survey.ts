@@ -54,7 +54,9 @@ function apiPost(action: string, payload: Record<string, unknown>): void {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify({ action, ...payload }),
-  }).catch(() => { /* silent — app works offline */ });
+  }).then(res => {
+    if (!res.ok) res.json().then(e => console.warn('[survey api]', action, e)).catch(() => {});
+  }).catch(() => { /* offline — silent */ });
 }
 
 export function savePre(pre: PreSurvey): string {
