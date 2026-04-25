@@ -115,6 +115,26 @@ function downloadCSV(sessions: SurveySession[]) {
 
 /* ── Session table ───────────────────────────────────────────────────────── */
 
+function PhotoLightbox({ src, onClose }: { src: string; onClose: () => void }) {
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => { if (e.key === 'Escape') onClose(); };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  }, [onClose]);
+  return (
+    <div
+      onClick={onClose}
+      style={{
+        position: 'fixed', inset: 0, zIndex: 300, background: 'rgba(0,0,0,0.9)',
+        display: 'flex', alignItems: 'center', justifyContent: 'center', cursor: 'zoom-out',
+      }}
+    >
+      <img src={src} alt="" style={{ maxWidth: '92vw', maxHeight: '90vh', borderRadius: 12, boxShadow: '0 8px 40px rgba(0,0,0,0.6)' }} />
+      <span style={{ position: 'absolute', top: 18, right: 22, color: 'rgba(240,244,255,0.7)', fontSize: '1.5rem', pointerEvents: 'none' }}>✕</span>
+    </div>
+  );
+}
+
 function SessionTable({ title, subtitle, sessions, indexOffset, onDelete }: {
   title: string;
   subtitle?: string;
@@ -122,6 +142,8 @@ function SessionTable({ title, subtitle, sessions, indexOffset, onDelete }: {
   indexOffset: number;
   onDelete: (id: string) => void;
 }) {
+  const [lightbox, setLightbox] = useState<string | null>(null);
+  const expand = (src: string) => setLightbox(src);
   return (
     <div style={{ marginBottom: '2rem' }}>
       <div style={{ padding: '0.5rem 1rem 0.25rem', display: 'flex', alignItems: 'baseline', gap: 10 }}>
@@ -132,6 +154,7 @@ function SessionTable({ title, subtitle, sessions, indexOffset, onDelete }: {
         <div style={{ padding: '0.75rem 1rem', color: 'rgba(240,244,255,0.3)', fontSize: '0.8rem' }}>No entries</div>
       ) : (
         <div className="admin-table-wrap">
+          {lightbox && <PhotoLightbox src={lightbox} onClose={() => setLightbox(null)} />}
           <table className="admin-table">
             <thead>
               <tr>
@@ -187,19 +210,19 @@ function SessionTable({ title, subtitle, sessions, indexOffset, onDelete }: {
                     </td>
                     <td>
                       {s.scanPhotoUrl
-                        ? <img src={s.scanPhotoUrl} alt="scan" className="admin-photo" />
+                        ? <img src={s.scanPhotoUrl} alt="scan" className="admin-photo admin-photo--click" onClick={() => expand(s.scanPhotoUrl!)} />
                         : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
                     </td>
                     <td>
                       {s.carPhotoUrl
-                        ? <img src={s.carPhotoUrl} alt="car" className="admin-photo" />
+                        ? <img src={s.carPhotoUrl} alt="car" className="admin-photo admin-photo--click" onClick={() => expand(s.carPhotoUrl!)} />
                         : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
                     </td>
                     <td>
                       {images.length > 0
                         ? <div style={{ display: 'flex', gap: 3 }}>
                             {images.map(img => (
-                              <img key={img.label} src={img.url} alt={img.label} className="admin-photo" title={img.label} />
+                              <img key={img.label} src={img.url} alt={img.label} className="admin-photo admin-photo--click" title={img.label} onClick={() => expand(img.url)} />
                             ))}
                           </div>
                         : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}

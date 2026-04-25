@@ -883,6 +883,14 @@ td.cell-empty   { color: rgba(240,244,255,0.25); }
   border-radius: 6px;
   border: 1px solid var(--surface2);
 }
+.admin-photo--click {
+  cursor: zoom-in;
+  transition: border-color 0.15s, transform 0.15s;
+}
+.admin-photo--click:hover {
+  border-color: rgba(100,210,255,0.6);
+  transform: scale(1.08);
+}
 
 /* ── Phase 0 — Invisible Secret ─────────────────────────────────────────── */
 .phase-invisible {

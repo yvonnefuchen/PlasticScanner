@@ -422,20 +422,20 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color, la
       /* 2. Poll every 4s for up to 3 minutes */
       let elapsed = 0;
       pollId = setInterval(async () => {
-        if (cancelled) { clearInterval(pollId!); return; }
         elapsed += 4;
-        if (elapsed > 180) { clearInterval(pollId!); setLoading(false); return; }
+        if (elapsed > 180) { clearInterval(pollId!); if (!cancelled) setLoading(false); return; }
         try {
           const res = await fetch(`/api/reshape-image?jobId=${jobId}`);
           const data = await res.json() as { status: string; url?: string; error?: string };
           if (data.status === 'done' || data.status === 'error') {
             clearInterval(pollId!);
-            setLoading(false);
+            if (!cancelled) setLoading(false);
             if (data.url) {
-              setImgUrl(data.url);
+              if (!cancelled) setImgUrl(data.url);
+              // Save even if user already navigated away — localStorage + API
               if (sessionId) { saveReshapeImage(sessionId, label, data.url); onImageSaved?.(label); }
             }
-            else if (data.error) setDebugMsg(data.error);
+            else if (data.error && !cancelled) setDebugMsg(data.error);
           }
         } catch { /* keep polling */ }
       }, 4000);
@@ -444,7 +444,9 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color, la
     return () => {
       cancelled = true;
       clearTimeout(startTimer);
-      if (pollId) clearInterval(pollId);
+      // Intentionally do NOT clear pollId here — an in-flight generation should still
+      // save to localStorage even after the user has navigated away. The interval
+      // self-terminates when the job finishes or after 180s.
     };
   }, [objectName, reshape, lang]);
 
