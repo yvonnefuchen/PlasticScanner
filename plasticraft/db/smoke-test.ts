@@ -4,11 +4,11 @@
  *
  * Usage:
  *   BASE_URL=https://plasticraft.vercel.app \
- *   ADMIN_PASSWORD=futurecraft \
+ *   ADMIN_PASSWORD=<password> \
  *   npx tsx db/smoke-test.ts
  *
  * Against localhost (npx vercel dev):
- *   BASE_URL=http://localhost:3000 ADMIN_PASSWORD=futurecraft npx tsx db/smoke-test.ts
+ *   BASE_URL=http://localhost:3000 ADMIN_PASSWORD=<password> npx tsx db/smoke-test.ts
  */
 
 import { createHmac } from 'crypto';
