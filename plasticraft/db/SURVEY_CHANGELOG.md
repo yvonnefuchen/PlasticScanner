@@ -11,6 +11,20 @@
 > **Why this matters:** sessions only store the answer (e.g. `3` or `'B'`), not the question text.
 > Without version tracking, you can't tell which question a historical answer belongs to.
 
+## How to add/change database columns
+
+1. Create a new file in `db/migrations/` — e.g. `004_add_new_column.sql`
+2. Run migrations: `POSTGRES_URL=<connection-string> npx tsx db/migrate.ts`
+3. Reload PostgREST schema cache — in Supabase SQL Editor run: `NOTIFY pgrst, 'reload schema';`
+4. Run smoke tests to confirm the API works end-to-end:
+   ```
+   BASE_URL=https://plasticraft.vercel.app ADMIN_PASSWORD=<password> npx tsx db/smoke-test.ts
+   ```
+5. All 8 checks must pass before deploying
+
+> **Why this matters:** PostgREST caches the DB schema and won't see new columns until notified.
+> The smoke test catches this (and other API failures) before users do.
+
 ---
 
 ## Version 1 — 2026-04-25 (initial)
