@@ -246,8 +246,18 @@ export function PhaseMaking({ onDone, onBack, sessionId }: Props) {
 
   useEffect(() => {
     if (!sessionId) return;
-    const session = getSessions().find(s => s.id === sessionId);
-    setReshapeImages(session?.reshapeImages ?? []);
+    const read = () => {
+      const session = getSessions().find(s => s.id === sessionId);
+      setReshapeImages(session?.reshapeImages ?? []);
+    };
+    read();
+    // Poll for up to 90s in case images are still generating when we arrive here
+    let ticks = 0;
+    const timer = setInterval(() => {
+      read();
+      if (++ticks >= 45) clearInterval(timer);
+    }, 2000);
+    return () => clearInterval(timer);
   }, [sessionId]);
 
   // Camera state for completion step
