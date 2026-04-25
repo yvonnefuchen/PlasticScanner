@@ -1,4 +1,4 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type SupabaseClient } from '@supabase/supabase-js';
 import { createHmac } from 'crypto';
 import type { IncomingMessage, ServerResponse } from 'http';
 
@@ -165,11 +165,8 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
 
 /* Upload a base64 data URL to the session-assets Storage bucket.
    Returns the public URL on success, null on failure. */
-async function uploadImage(
-  supabase: ReturnType<typeof createClient>,
-  dataUrl: string,
-  path: string,  // without extension — derived from mimeType
-): Promise<string | null> {
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+async function uploadImage(supabase: SupabaseClient<any, any, any>, dataUrl: string, path: string): Promise<string | null> {
   const mimeType = dataUrl.match(/^data:(image\/\w+);base64,/)?.[1] ?? 'image/jpeg';
   const ext = mimeType.split('/')[1];
   const fullPath = `${path}.${ext}`;
