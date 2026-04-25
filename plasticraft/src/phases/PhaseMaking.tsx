@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { T } from '../components/T';
 import { BinCharacter } from '../components/PlasticShapes';
 import type { Tri } from '../data/plastics';
-import { savePhoto } from '../services/survey';
+import { saveCarPhoto } from '../services/survey';
 
 interface Props {
   onDone: () => void;
@@ -283,7 +283,7 @@ export function PhaseMaking({ onDone, onBack, sessionId }: Props) {
     streamRef.current?.getTracks().forEach(t => t.stop());
     setCameraOpen(false);
     setPhotoUrl(url);
-    if (sessionId) savePhoto(sessionId, url);
+    if (sessionId) saveCarPhoto(sessionId, url);
   };
 
   const retakePhoto = () => {

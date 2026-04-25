@@ -7,7 +7,7 @@ import type { PlasticId, PlasticType } from '../data/plastics';
 import { PLASTICS } from '../data/plastics';
 import type { ScanData } from '../services/scanner';
 import { resizeImage } from '../services/scanner';
-import { saveAiImage } from '../services/survey';
+import { saveReshapeImage } from '../services/survey';
 
 interface Props {
   plastic: PlasticType;
@@ -271,7 +271,7 @@ export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, s
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
               {reshapeRequests.map((r, i) => (
                 <motion.div key={i} initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 + i * 0.15 }} style={{ flex: '1 1 0', minWidth: 0 }}>
-                  <ReshapeCard sourceImage={capturedImage ?? null} objectName={obj!.object_name_en} reshape={r.reshapeTarget} emoji={r.emoji} label={r.label} color={confirmed.color} lang={lang} />
+                  <ReshapeCard sourceImage={capturedImage ?? null} objectName={obj!.object_name_en} reshape={r.reshapeTarget} emoji={r.emoji} label={r.label} color={confirmed.color} lang={lang} sessionId={sessionId} />
                 </motion.div>
               ))}
             </div>
@@ -385,7 +385,7 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color, la
   color: string;
   lang: string;
   sessionId?: string | null;
-  onImageSaved?: () => void;
+  onImageSaved?: (label: string) => void;
 }) {
   const [imgUrl, setImgUrl] = useState<string | null>(null);
   const [imgFailed, setImgFailed] = useState(false);
@@ -433,7 +433,7 @@ function ReshapeCard({ sourceImage, objectName, reshape, emoji, label, color, la
             setLoading(false);
             if (data.url) {
               setImgUrl(data.url);
-              if (sessionId) { saveAiImage(sessionId, data.url); onImageSaved?.(); }
+              if (sessionId) { saveReshapeImage(sessionId, label, data.url); onImageSaved?.(label); }
             }
             else if (data.error) setDebugMsg(data.error);
           }

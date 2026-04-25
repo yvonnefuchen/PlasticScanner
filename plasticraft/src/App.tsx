@@ -17,7 +17,7 @@ import { PhaseSurveyPost } from './phases/PhaseSurveyPost';
 
 import { PLASTICS, DEMO_PLASTIC, type PlasticId } from './data/plastics';
 import { identifyPlastic, DEMO_SCAN_DATA, type ScanData } from './services/scanner';
-import { savePhoto } from './services/survey';
+import { saveScanPhoto } from './services/survey';
 
 type AppPhase =
   | 'idle'
@@ -68,7 +68,7 @@ function AppInner() {
     setPhase('analyzing');
     setCountdown(null);
     setCapturedImage(dataUrl);
-    if (sessionId) savePhoto(sessionId, dataUrl);
+    if (sessionId) saveScanPhoto(sessionId, dataUrl);
     try {
       const result = await identifyPlastic(dataUrl);
       setIdentifiedId(result.plasticId);

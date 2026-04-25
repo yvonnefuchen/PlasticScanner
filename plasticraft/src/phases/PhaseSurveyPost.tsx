@@ -82,21 +82,21 @@ const P2_B: Tri = { zh: 'B) 變脆、容易壞掉 ✓', ja: 'B) ボロボロに 
 
 /* ── AI Q3 ── */
 const P3: Tri = {
-  zh: '3. 看到 AI 把「你的垃圾」變成很酷的圖片，你有沒有更想了解這個材料？',
+  zh: '3. 看到 AI 為你畫了很酷的圖，你有沒有更想了解垃圾和回收？',
   ja: '3. AIくんがかっこいい絵にしてくれて、ごみについてもっと知りたくなった？',
-  en: '3. After the AI turned YOUR trash into a cool picture, did you want to learn more about the material?',
+  en: '3. After the AI made you a cool picture, did you want to learn more about waste and recycling?',
 };
 const P3_LOW: Tri = { zh: '完全沒有 😞', ja: 'ぜんぜん 😞', en: 'Not at all 😞' };
 const P3_HIGH: Tri = { zh: '超想知道！🤩', ja: 'もっと しりたい！🤩', en: 'Very much! 🤩' };
 
 /* ── AI Q4 ── */
 const P4: Tri = {
-  zh: '4. 看到 AI 畫的酷圖之後，你有沒有更想選對正確的材料？',
+  zh: '4. AI 畫的圖有沒有幫助你製作小車？',
   ja: '4. AIくんの絵はくるまを作る時のよいヒントになった？',
-  en: '4. Seeing the AI\'s cool picture, did it make you want to pick the right materials?',
+  en: '4. Was the AI\'s picture a helpful hint for making your car?',
 };
 const P4_LOW: Tri = { zh: '完全沒有 😞', ja: 'ぜんぜん 😞', en: 'Not at all 😞' };
-const P4_HIGH: Tri = { zh: '好想選對！🤩', ja: 'えらびたい！🤩', en: 'Yes, I want to! 🤩' };
+const P4_HIGH: Tri = { zh: '超有幫助！🤩', ja: 'とても役立った！🤩', en: 'Very helpful! 🤩' };
 
 /* ── AI Q5 ── */
 const P5: Tri = {
