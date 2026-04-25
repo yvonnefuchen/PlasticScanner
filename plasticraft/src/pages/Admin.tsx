@@ -102,8 +102,8 @@ function Cell({ v, correct }: { v: string | undefined; correct?: boolean | null 
   return <td>{v}</td>;
 }
 
-function downloadCSV() {
-  const csv = exportCSV();
+function downloadCSV(sessions: SurveySession[]) {
+  const csv = exportCSV(sessions);
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
@@ -113,11 +113,124 @@ function downloadCSV() {
   URL.revokeObjectURL(url);
 }
 
+/* ── Session table ───────────────────────────────────────────────────────── */
+
+function SessionTable({ title, subtitle, sessions, indexOffset, onDelete }: {
+  title: string;
+  subtitle?: string;
+  sessions: SurveySession[];
+  indexOffset: number;
+  onDelete: (id: string) => void;
+}) {
+  return (
+    <div style={{ marginBottom: '2rem' }}>
+      <div style={{ padding: '0.5rem 1rem 0.25rem', display: 'flex', alignItems: 'baseline', gap: 10 }}>
+        <span style={{ color: 'rgba(240,244,255,0.7)', fontWeight: 600, fontSize: '0.85rem' }}>{title}</span>
+        {subtitle && <span style={{ color: 'rgba(240,244,255,0.35)', fontSize: '0.75rem' }}>{subtitle}</span>}
+      </div>
+      {sessions.length === 0 ? (
+        <div style={{ padding: '0.75rem 1rem', color: 'rgba(240,244,255,0.3)', fontSize: '0.8rem' }}>No entries</div>
+      ) : (
+        <div className="admin-table-wrap">
+          <table className="admin-table">
+            <thead>
+              <tr>
+                <th></th>
+                <th>#</th>
+                <th>Time</th>
+                <th>V</th>
+                <th>Location</th>
+                <th>Scan Photo</th>
+                <th>Car Photo</th>
+                <th>AI Images</th>
+                <th>Pre Q1 Sort 😊</th>
+                <th>Pre Q2 Marks</th>
+                <th>Pre Q3 Cap</th>
+                <th>Post P1 Mat</th>
+                <th>Post P2 Mix</th>
+                <th>Post P3 AI Interest 😊</th>
+                <th>Post P4 AI Hint 😊</th>
+                <th>Post P5 AI Proud 😊</th>
+                <th>Post P6 Sort 😊</th>
+                <th>Post P7 Fun 😊</th>
+              </tr>
+            </thead>
+            <tbody>
+              {sessions.map((s, i) => {
+                const images = s.reshapeImages ?? [];
+                return (
+                  <tr key={s.id}>
+                    <td>
+                      <button
+                        onClick={() => onDelete(s.id)}
+                        style={{
+                          background: 'none', border: 'none', cursor: 'pointer',
+                          color: 'rgba(239,83,80,0.6)', fontSize: '1rem', padding: '2px 6px',
+                          borderRadius: 6, lineHeight: 1,
+                        }}
+                        title="Delete entry"
+                      >
+                        🗑️
+                      </button>
+                    </td>
+                    <td style={{ color: 'rgba(240,244,255,0.4)', fontSize: '0.75rem' }}>{indexOffset + i + 1}</td>
+                    <td style={{ color: 'rgba(240,244,255,0.5)', fontSize: '0.75rem' }}>
+                      {new Date(s.timestamp).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
+                    </td>
+                    <td style={{ fontSize: '0.7rem', color: 'rgba(240,244,255,0.35)', textAlign: 'center' }}>
+                      {s.surveyVersion ?? 1}
+                    </td>
+                    <td style={{ fontSize: '0.75rem', color: 'rgba(240,244,255,0.6)', whiteSpace: 'nowrap' }}>
+                      {s.location?.city || s.location?.country
+                        ? `${s.location.city ? s.location.city + ', ' : ''}${s.location.country ?? ''}`
+                        : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
+                    </td>
+                    <td>
+                      {s.scanPhotoUrl
+                        ? <img src={s.scanPhotoUrl} alt="scan" className="admin-photo" />
+                        : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
+                    </td>
+                    <td>
+                      {s.carPhotoUrl
+                        ? <img src={s.carPhotoUrl} alt="car" className="admin-photo" />
+                        : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
+                    </td>
+                    <td>
+                      {images.length > 0
+                        ? <div style={{ display: 'flex', gap: 3 }}>
+                            {images.map(img => (
+                              <img key={img.label} src={img.url} alt={img.label} className="admin-photo" title={img.label} />
+                            ))}
+                          </div>
+                        : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
+                    </td>
+                    <td>{stars(s.pre.q1_sort_habit)}</td>
+                    <Cell v={s.pre.q2_seen_marks} correct={null} />
+                    <Cell v={s.pre.q3_cap_behavior} correct={s.pre.q3_cap_behavior === 'B' ? true : false} />
+                    <Cell v={s.post?.p1_cap_material} correct={s.post ? s.post.p1_cap_material === 'B' : null} />
+                    <Cell v={s.post?.p2_mix_result} correct={s.post ? s.post.p2_mix_result === 'B' : null} />
+                    <td>{stars(s.post?.p3_ai_interest)}</td>
+                    <td>{stars(s.post?.p4_ai_clarity)}</td>
+                    <td>{stars(s.post?.p5_ai_achievement)}</td>
+                    <td>{stars(s.post?.p6_sort_intention)}</td>
+                    <td>{stars(s.post?.p7_fun)}</td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </div>
+  );
+}
+
 /* ── Main ────────────────────────────────────────────────────────────────── */
 
 export default function Admin() {
   const [authed, setAuthed] = useState(() => loadToken() !== null);
-  const [sessions, setSessions] = useState<SurveySession[]>(() => getSessions());
+  const [dbSessions, setDbSessions] = useState<SurveySession[]>([]);
+  const [localSessions, setLocalSessions] = useState<SurveySession[]>(() => getSessions());
   const [fetching, setFetching] = useState(false);
   const [imgStyle, setImgStyle] = useState<'auto' | 'vehicle'>(
     () => (localStorage.getItem('plasticraft_img_style') as 'auto' | 'vehicle') ?? 'auto'
@@ -126,39 +239,32 @@ export default function Admin() {
     () => (localStorage.getItem('plasticraft_app_mode') as 'production' | 'testing') ?? 'production'
   );
 
-  const mergeSessions = (apiData: SurveySession[] | null): SurveySession[] => {
-    const local = getSessions();
-    if (!apiData) return local;
-    // API takes precedence for matching ids; append local-only sessions at the end
-    const apiIds = new Set(apiData.map(s => s.id));
-    const localOnly = local.filter(s => !apiIds.has(s.id));
-    return [...apiData, ...localOnly];
+  const fetchAndSplit = (token: string | null) => {
+    setFetching(true);
+    (token ? getSessionsFromApi(token) : Promise.resolve(null)).then(apiData => {
+      const db = apiData ?? [];
+      const apiIds = new Set(db.map(s => s.id));
+      setDbSessions(db);
+      setLocalSessions(getSessions().filter(s => !apiIds.has(s.id)));
+      setFetching(false);
+    });
   };
 
   useEffect(() => {
     if (!authed) return;
-    setFetching(true);
-    const token = loadToken();
-    (token ? getSessionsFromApi(token) : Promise.resolve(null)).then(data => {
-      setSessions(mergeSessions(data));
-      setFetching(false);
-    });
+    fetchAndSplit(loadToken());
   }, [authed]);
 
   if (!authed) return <LoginGate onAuth={() => setAuthed(true)} />;
 
-  const refresh = () => {
-    setFetching(true);
-    const token = loadToken();
-    (token ? getSessionsFromApi(token) : Promise.resolve(null)).then(data => {
-      setSessions(mergeSessions(data));
-      setFetching(false);
-    });
-  };
+  const refresh = () => fetchAndSplit(loadToken());
+
+  const allSessions = [...dbSessions, ...localSessions];
 
   const handleDelete = async (id: string) => {
     deleteSession(id);
-    setSessions(s => s.filter(x => x.id !== id));
+    setDbSessions(s => s.filter(x => x.id !== id));
+    setLocalSessions(s => s.filter(x => x.id !== id));
   };
 
   const handleStyleChange = (s: 'auto' | 'vehicle') => {
@@ -170,8 +276,8 @@ export default function Admin() {
     setAppMode(m);
   };
 
-  const completed = sessions.filter(s => s.post !== null);
-  const q1Ratings = sessions.map(s => s.pre.q1_sort_habit).filter(Boolean);
+  const completed = allSessions.filter(s => s.post !== null);
+  const q1Ratings = allSessions.map(s => s.pre.q1_sort_habit).filter(Boolean);
   const p3Ratings = completed.map(s => s.post!.p3_ai_interest);
   const p4Ratings = completed.map(s => s.post!.p4_ai_clarity);
   const p5Ratings = completed.map(s => s.post!.p5_ai_achievement);
@@ -184,7 +290,7 @@ export default function Admin() {
           <button className="admin-csv-btn" onClick={refresh} disabled={fetching}>
             {fetching ? '⏳' : '↻'} Refresh
           </button>
-          <button className="admin-csv-btn" onClick={downloadCSV}>⬇ Export CSV</button>
+          <button className="admin-csv-btn" onClick={() => downloadCSV(allSessions)}>⬇ Export CSV</button>
           <button className="admin-csv-btn" onClick={() => { localStorage.removeItem(TOKEN_KEY); setAuthed(false); }}>
             🔒 Sign out
           </button>
@@ -231,8 +337,8 @@ export default function Admin() {
       {/* Stats */}
       <div className="admin-stats">
         {[
-          { label: 'Total Sessions', value: sessions.length },
-          { label: 'Completed Post-Survey', value: `${completed.length} (${sessions.length ? Math.round(completed.length / sessions.length * 100) : 0}%)` },
+          { label: 'Total Sessions', value: allSessions.length },
+          { label: 'Completed Post-Survey', value: `${completed.length} (${allSessions.length ? Math.round(completed.length / allSessions.length * 100) : 0}%)` },
           { label: 'Pre: Avg Sort Habit 😊', value: avg(q1Ratings) },
           { label: 'Post: Avg AI Interest 😊', value: avg(p3Ratings) },
           { label: 'Post: Avg AI Hint 😊', value: avg(p4Ratings) },
@@ -245,108 +351,23 @@ export default function Admin() {
         ))}
       </div>
 
-      {fetching && sessions.length === 0 ? (
+      {fetching && allSessions.length === 0 ? (
         <div className="admin-empty" style={{ opacity: 0.5 }}>Loading…</div>
-      ) : sessions.length === 0 ? (
+      ) : allSessions.length === 0 ? (
         <div className="admin-empty">No survey responses yet. Play the game to collect data!</div>
       ) : (
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th></th>
-                <th>#</th>
-                <th>Time</th>
-                <th>V</th>
-                <th>Location</th>
-                <th>Scan Photo</th>
-                <th>Car Photo</th>
-                <th>AI Images</th>
-                {/* Pre */}
-                <th>Pre Q1 Sort 😊</th>
-                <th>Pre Q2 Marks</th>
-                <th>Pre Q3 Cap</th>
-                {/* Post Knowledge */}
-                <th>Post P1 Mat</th>
-                <th>Post P2 Mix</th>
-                {/* Post AI */}
-                <th>Post P3 AI Interest 😊</th>
-                <th>Post P4 AI Hint 😊</th>
-                <th>Post P5 AI Proud 😊</th>
-                {/* Post Action */}
-                <th>Post P6 Sort 😊</th>
-                <th>Post P7 Fun 😊</th>
-              </tr>
-            </thead>
-            <tbody>
-              {sessions.map((s, i) => {
-                const images = s.reshapeImages ?? [];
-                return (
-                  <tr key={s.id}>
-                    <td>
-                      <button
-                        onClick={() => handleDelete(s.id)}
-                        style={{
-                          background: 'none', border: 'none', cursor: 'pointer',
-                          color: 'rgba(239,83,80,0.6)', fontSize: '1rem', padding: '2px 6px',
-                          borderRadius: 6, lineHeight: 1,
-                        }}
-                        title="Delete entry"
-                      >
-                        🗑️
-                      </button>
-                    </td>
-                    <td style={{ color: 'rgba(240,244,255,0.4)', fontSize: '0.75rem' }}>{i + 1}</td>
-                    <td style={{ color: 'rgba(240,244,255,0.5)', fontSize: '0.75rem' }}>
-                      {new Date(s.timestamp).toLocaleString('zh-TW', { month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' })}
-                    </td>
-                    <td style={{ fontSize: '0.7rem', color: 'rgba(240,244,255,0.35)', textAlign: 'center' }}>
-                      {s.surveyVersion ?? 1}
-                    </td>
-                    <td style={{ fontSize: '0.75rem', color: 'rgba(240,244,255,0.6)', whiteSpace: 'nowrap' }}>
-                      {s.location?.city || s.location?.country
-                        ? `${s.location.city ? s.location.city + ', ' : ''}${s.location.country ?? ''}`
-                        : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
-                    </td>
-                    <td>
-                      {s.scanPhotoUrl
-                        ? <img src={s.scanPhotoUrl} alt="scan" className="admin-photo" />
-                        : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
-                    </td>
-                    <td>
-                      {s.carPhotoUrl
-                        ? <img src={s.carPhotoUrl} alt="car" className="admin-photo" />
-                        : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
-                    </td>
-                    <td>
-                      {images.length > 0
-                        ? <div style={{ display: 'flex', gap: 3 }}>
-                            {images.map(img => (
-                              <img key={img.label} src={img.url} alt={img.label} className="admin-photo" title={img.label} />
-                            ))}
-                          </div>
-                        : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
-                    </td>
-                    {/* Pre */}
-                    <td>{stars(s.pre.q1_sort_habit)}</td>
-                    <Cell v={s.pre.q2_seen_marks} correct={null} />
-                    <Cell v={s.pre.q3_cap_behavior} correct={s.pre.q3_cap_behavior === 'B' ? true : false} />
-                    {/* Post Knowledge */}
-                    <Cell v={s.post?.p1_cap_material} correct={s.post ? s.post.p1_cap_material === 'B' : null} />
-                    <Cell v={s.post?.p2_mix_result} correct={s.post ? s.post.p2_mix_result === 'B' : null} />
-                    {/* Post AI */}
-                    <td>{stars(s.post?.p3_ai_interest)}</td>
-                    <td>{stars(s.post?.p4_ai_clarity)}</td>
-                    <td>{stars(s.post?.p5_ai_achievement)}</td>
-                    {/* Post Action */}
-                    <td>{stars(s.post?.p6_sort_intention)}</td>
-                    <td>{stars(s.post?.p7_fun)}</td>
-                  </tr>
-                );
-              })}
-            </tbody>
-          </table>
-        </div>
+        <>
+          <SessionTable title={`Database (${dbSessions.length})`} sessions={dbSessions} indexOffset={0} onDelete={handleDelete} />
+          {localSessions.length > 0 && (
+            <SessionTable
+              title={`Local storage only (${localSessions.length})`}
+              subtitle="These sessions haven't synced to the database yet — they exist only on this device."
+              sessions={localSessions}
+              indexOffset={dbSessions.length}
+              onDelete={handleDelete}
+            />
+          )}
+        </>
       )}
     </div>
   );

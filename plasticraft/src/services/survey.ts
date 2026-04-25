@@ -134,8 +134,12 @@ export function deleteSession(id: string): void {
   apiPost('deleteSession', { id });
 }
 
-export function exportCSV(): string {
-  const all = load();
+function photoCell(url: string | undefined): string {
+  if (!url) return '';
+  return url.startsWith('data:') ? '[local-only]' : url;
+}
+
+export function exportCSV(sessions: SurveySession[]): string {
   const headers = [
     'id', 'timestamp',
     // Pre
@@ -148,8 +152,8 @@ export function exportCSV(): string {
     'post_p6_sort_intention', 'post_p7_fun',
     // Meta
     'survey_version', 'location_country', 'location_city',
-    // Photos
-    'scan_photo', 'car_photo', 'reshape_images_count',
+    // Photos — public URLs for DB sessions, [local-only] for unsynced base64
+    'scan_photo_url', 'car_photo_url', 'reshape_images_count',
   ];
   const esc = (v: string | number | undefined) => {
     if (v === undefined || v === null) return '';
@@ -157,15 +161,15 @@ export function exportCSV(): string {
     return s.includes(',') || s.includes('"') || s.includes('\n')
       ? `"${s.replace(/"/g, '""')}"` : s;
   };
-  const rows = all.map(s => [
+  const rows = sessions.map(s => [
     s.id, s.timestamp,
     s.pre.q1_sort_habit, s.pre.q2_seen_marks, s.pre.q3_cap_behavior,
     s.post?.p1_cap_material, s.post?.p2_mix_result,
     s.post?.p3_ai_interest, s.post?.p4_ai_clarity, s.post?.p5_ai_achievement,
     s.post?.p6_sort_intention, s.post?.p7_fun,
     s.surveyVersion ?? 1, s.location?.country ?? '', s.location?.city ?? '',
-    s.scanPhotoUrl ? '[photo]' : '',
-    s.carPhotoUrl ? '[photo]' : '',
+    photoCell(s.scanPhotoUrl),
+    photoCell(s.carPhotoUrl),
     s.reshapeImages?.length ?? 0,
   ].map(esc));
   return [headers, ...rows].map(r => r.join(',')).join('\n');
