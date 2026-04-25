@@ -83,7 +83,7 @@ const P2_B: Tri = { zh: 'B) 變脆、容易壞掉 ✓', ja: 'B) ボロボロに 
 /* ── AI Q3 ── */
 const P3: Tri = {
   zh: '3. 看到 AI 把「你的垃圾」變成很酷的圖片，你有沒有更想了解這個材料？',
-  ja: '3. AIくんが「きみの ゴミ」を かっこいい 絵（え）に かえてくれたあと、その 材料（ざいりょう）について もっと しりたくなった？',
+  ja: '3. AIくんがかっこいい絵にしてくれて、ごみについてもっと知りたくなった？',
   en: '3. After the AI turned YOUR trash into a cool picture, did you want to learn more about the material?',
 };
 const P3_LOW: Tri = { zh: '完全沒有 😞', ja: 'ぜんぜん 😞', en: 'Not at all 😞' };
@@ -92,7 +92,7 @@ const P3_HIGH: Tri = { zh: '超想知道！🤩', ja: 'もっと しりたい！
 /* ── AI Q4 ── */
 const P4: Tri = {
   zh: '4. 看到 AI 畫的酷圖之後，你有沒有更想選對正確的材料？',
-  ja: '4. AIくんの かっこいい 絵（え）を みたら、材料（ざいりょう）を 正（ただ）しく えらびたくなった？',
+  ja: '4. AIくんの絵はくるまを作る時のよいヒントになった？',
   en: '4. Seeing the AI\'s cool picture, did it make you want to pick the right materials?',
 };
 const P4_LOW: Tri = { zh: '完全沒有 😞', ja: 'ぜんぜん 😞', en: 'Not at all 😞' };
