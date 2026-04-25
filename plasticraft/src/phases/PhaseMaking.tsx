@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { T } from '../components/T';
 import { BinCharacter } from '../components/PlasticShapes';
 import type { Tri } from '../data/plastics';
-import { saveCarPhoto } from '../services/survey';
+import { saveCarPhoto, getSessions } from '../services/survey';
 
 interface Props {
   onDone: () => void;
@@ -232,12 +232,23 @@ const TAKE_PHOTO_BTN: Tri = { zh: '📸 拍照', ja: '📸 写真を撮る', en:
 const RETAKE_BTN: Tri = { zh: '重拍', ja: '撮り直す', en: 'Retake' };
 const PHOTO_SAVED: Tri = { zh: '✅ 照片已儲存！', ja: '✅ 写真を保存しました！', en: '✅ Photo saved!' };
 const SKIP_PHOTO_BTN: Tri = { zh: '略過，繼續', ja: 'スキップして続ける', en: 'Skip & Continue' };
+const DESIGN_LABEL: Tri = { zh: '🎨 你的 AI 設計', ja: '🎨 あなたのAIデザイン', en: '🎨 Your AI Design' };
 
 /* ── Component ────────────────────────────────────────────────────────────── */
 
 export function PhaseMaking({ onDone, onBack, sessionId }: Props) {
   const [step, setStep] = useState(0);
   const [dir, setDir] = useState(1);
+
+  // AI reference images
+  const [reshapeImages, setReshapeImages] = useState<Array<{ label: string; url: string }>>([]);
+  const [expandedImg, setExpandedImg] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!sessionId) return;
+    const session = getSessions().find(s => s.id === sessionId);
+    setReshapeImages(session?.reshapeImages ?? []);
+  }, [sessionId]);
 
   // Camera state for completion step
   const [cameraOpen, setCameraOpen] = useState(false);
@@ -299,6 +310,33 @@ export function PhaseMaking({ onDone, onBack, sessionId }: Props) {
   return (
     <div className="phase-container phase-making">
       <h2 className="making-title"><T s={PHASE_TITLE} /></h2>
+
+      {/* AI design reference strip */}
+      {reshapeImages.length > 0 && (
+        <div className="making-reference">
+          <span className="making-reference__label"><T s={DESIGN_LABEL} /></span>
+          <div className="making-reference__strip">
+            {reshapeImages.map(img => (
+              <img
+                key={img.label}
+                src={img.url}
+                alt={img.label}
+                className="making-reference__thumb"
+                onClick={() => setExpandedImg(img.url)}
+                title={img.label}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* Full-size overlay */}
+      {expandedImg && (
+        <div className="making-reference__overlay" onClick={() => setExpandedImg(null)}>
+          <img src={expandedImg} alt="AI design" className="making-reference__full" />
+          <span className="making-reference__close">✕</span>
+        </div>
+      )}
 
       <AnimatePresence mode="wait">
         {step === 0 && (

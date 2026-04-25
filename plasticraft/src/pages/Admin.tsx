@@ -182,7 +182,7 @@ function SessionTable({ title, subtitle, sessions, indexOffset, onDelete }: {
                     </td>
                     <td style={{ fontSize: '0.75rem', color: 'rgba(240,244,255,0.6)', whiteSpace: 'nowrap' }}>
                       {s.location?.city || s.location?.country
-                        ? `${s.location.city ? s.location.city + ', ' : ''}${s.location.country ?? ''}`
+                        ? `${s.location.city ? decodeURIComponent(s.location.city) + ', ' : ''}${s.location.country ?? ''}`
                         : <span style={{ color: 'rgba(240,244,255,0.25)' }}>—</span>}
                     </td>
                     <td>

@@ -83,10 +83,11 @@ export default async function handler(req: IncomingMessage, res: ServerResponse)
     if (action === 'savePre') {
       const { id, timestamp, pre } = body as { id: string; timestamp: string; pre: unknown };
       if (!id || !pre) return json(res, 400, { error: 'Missing id or pre' });
+      const decode = (v: unknown) => typeof v === 'string' ? decodeURIComponent(v) : undefined;
       const location = {
-        country: req.headers['x-vercel-ip-country'] as string | undefined,
-        city: req.headers['x-vercel-ip-city'] as string | undefined,
-        region: req.headers['x-vercel-ip-country-region'] as string | undefined,
+        country: decode(req.headers['x-vercel-ip-country']),
+        city: decode(req.headers['x-vercel-ip-city']),
+        region: decode(req.headers['x-vercel-ip-country-region']),
       };
       const surveyVersion = (body as { surveyVersion?: number })['surveyVersion'] ?? 1;
       let { error } = await supabase.from('sessions').upsert({ id, timestamp, pre, location, survey_version: surveyVersion });
