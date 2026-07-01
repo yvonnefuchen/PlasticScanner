@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { T } from '../components/T';
 import { EmojiRating } from '../components/EmojiRating';
-import { PlasticMascot } from '../components/PlasticMascot'; import { PETBottle, PPCap } from '../components/PlasticShapes';
+import { PlasticMascot } from '../components/PlasticMascot'; import { PetMark, PlaMark } from '../components/RecycleMarks';
 import { savePre, type McChoice } from '../services/survey';
 import type { Tri } from '../data/plastics';
 
@@ -71,17 +71,17 @@ function MarkBadges() {
   return (
     <div style={{ display: 'flex', gap: 12, justifyContent: 'center', margin: '8px 0 4px' }}>
       <div style={{
-        border: '2.5px solid #4FC3F7', borderRadius: 10, padding: '8px 16px',
-        textAlign: 'center', background: 'rgba(79,195,247,0.1)',
+        border: '2px solid #999', borderRadius: 10, padding: '8px 16px',
+        textAlign: 'center', background: '#fff',
       }}>
-        <PETBottle size={54} />
+        <PetMark size={54} />
         <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)', marginTop: 2 }}>ペットボトル</div>
       </div>
       <div style={{
-        border: '2.5px solid #81C784', borderRadius: 10, padding: '8px 16px',
-        textAlign: 'center', background: 'rgba(129,199,132,0.1)',
+        border: '2px solid #999', borderRadius: 10, padding: '8px 16px',
+        textAlign: 'center', background: '#fff',
       }}>
-        <PPCap size={54} />
+        <PlaMark size={54} />
         <div style={{ fontSize: '0.65rem', color: 'var(--text-dim)', marginTop: 2 }}>PP キャップ</div>
       </div>
     </div>
