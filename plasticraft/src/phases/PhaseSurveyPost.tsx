@@ -19,6 +19,7 @@ type PostAnswers = {
   p5: number;
   p6: number;
   p7: number;
+  p8: number;
 };
 
 /* ── Strings ── */
@@ -65,7 +66,7 @@ const FINISH_BTN: Tri = { zh: '完成！', ja: 'かんせい！', en: 'Finish!' 
 /* ── Knowledge Q1 ── */
 const P1: Tri = {
   zh: '1. 瓶蓋和吸管是用什麼材料做的？',
-  ja: '1. キャップや ストローの 材料（ざいりょう）は なに？',
+  ja: '1. キャップや ストローの ざいりょうは なに？',
   en: '1. What material are bottle caps and straws made of?',
 };
 const P1_A: Tri = { zh: 'A) PET（寶特瓶）', ja: 'A) PET（ペット）', en: 'A) PET' };
@@ -83,7 +84,7 @@ const P2_B: Tri = { zh: 'B) 變脆、容易壞掉 ✓', ja: 'B) ボロボロに 
 /* ── AI Q3 ── */
 const P3: Tri = {
   zh: '3. 看到 AI 為你畫了很酷的圖，你有沒有更想了解垃圾和回收？',
-  ja: '3. AIくんがかっこいい絵にしてくれて、ごみについてもっと知りたくなった？',
+  ja: '3. AIくんが かっこいい えに してくれて、ごみについて もっと しりたく なった？',
   en: '3. After the AI made you a cool picture, did you want to learn more about waste and recycling?',
 };
 const P3_LOW: Tri = { zh: '完全沒有 😞', ja: 'ぜんぜん 😞', en: 'Not at all 😞' };
@@ -92,11 +93,11 @@ const P3_HIGH: Tri = { zh: '超想知道！🤩', ja: 'もっと しりたい！
 /* ── AI Q4 ── */
 const P4: Tri = {
   zh: '4. AI 畫的圖有沒有幫助你製作小車？',
-  ja: '4. AIくんの絵はくるまを作る時のよいヒントになった？',
+  ja: '4. AIくんの えは くるまを つくる ときの よい ヒントに なった？',
   en: '4. Was the AI\'s picture a helpful hint for making your car?',
 };
 const P4_LOW: Tri = { zh: '完全沒有 😞', ja: 'ぜんぜん 😞', en: 'Not at all 😞' };
-const P4_HIGH: Tri = { zh: '超有幫助！🤩', ja: 'とても役立った！🤩', en: 'Very helpful! 🤩' };
+const P4_HIGH: Tri = { zh: '超有幫助！🤩', ja: 'とても やくに たった！🤩', en: 'Very helpful! 🤩' };
 
 /* ── AI Q5 ── */
 const P5: Tri = {
@@ -110,7 +111,7 @@ const P5_HIGH: Tri = { zh: '超驕傲！！🤩', ja: 'すごく うれしい！
 /* ── Action Q6 ── */
 const P6: Tri = {
   zh: '6. 從今天開始，你願意在家找找這些符號、分類丟垃圾嗎？',
-  ja: '6. これから おうちで マークを みつけて、ゴミを 分（わ）けてみたい？',
+  ja: '6. これから おうちで マークを みつけて、ゴミを わけてみたい？',
   en: '6. From now on, will you look for the marks and sort your rubbish at home?',
 };
 const P6_LOW: Tri = { zh: '不太想 😞', ja: 'したくない 😞', en: 'No way 😞' };
@@ -124,6 +125,15 @@ const P7: Tri = {
 };
 const P7_LOW: Tri = { zh: '不好玩 😞', ja: 'たのしくない 😞', en: 'Not fun 😞' };
 const P7_HIGH: Tri = { zh: '超好玩！！🤩', ja: 'さいこう！！🤩', en: 'The BEST!! 🤩' };
+
+/* ── Action Q8 ── */
+const P8: Tri = {
+  zh: '8. 透過這次的工作坊，你會想學習更多其他塑膠類型的用途嗎？',
+  ja: '8. きょうの ワークショップを うけて、ほかの プラスチックの つかいかたも もっと しりたいと おもう？',
+  en: '8. After this workshop, would you like to learn more about what other types of plastic can be used for?',
+};
+const P8_LOW: Tri = { zh: '完全沒有 😞', ja: 'ぜんぜん 😞', en: 'Not at all 😞' };
+const P8_HIGH: Tri = { zh: '超想學更多！🤩', ja: 'もっと しりたい！🤩', en: 'Very much! 🤩' };
 
 /* ── Toy Ideas ── */
 interface ToyIdea { emoji: string; material: string; color: string; bg: string; title: Tri; desc: Tri; }
@@ -194,14 +204,14 @@ function EmojiQ({ q, value, onChange, low, high }: { q: Tri; value: number; onCh
 /* ── Main ── */
 export function PhaseSurveyPost({ sessionId, onDone }: Props) {
   const [page, setPage] = useState(0);
-  const [answers, setAnswers] = useState<PostAnswers>({ p1: null, p2: null, p3: 0, p4: 0, p5: 0, p6: 0, p7: 0 });
+  const [answers, setAnswers] = useState<PostAnswers>({ p1: null, p2: null, p3: 0, p4: 0, p5: 0, p6: 0, p7: 0, p8: 0 });
   const [submitted, setSubmitted] = useState(false);
 
   const set = <K extends keyof PostAnswers>(k: K, v: PostAnswers[K]) =>
     setAnswers(a => ({ ...a, [k]: v }));
 
   const page0Done = answers.p1 !== null && answers.p2 !== null && answers.p3 > 0 && answers.p4 > 0 && answers.p5 > 0;
-  const page1Done = answers.p6 > 0 && answers.p7 > 0;
+  const page1Done = answers.p6 > 0 && answers.p7 > 0 && answers.p8 > 0;
 
   const handleSubmit = () => {
     if (!page1Done) return;
@@ -213,6 +223,7 @@ export function PhaseSurveyPost({ sessionId, onDone }: Props) {
       p5_ai_achievement: answers.p5,
       p6_sort_intention: answers.p6,
       p7_fun: answers.p7,
+      p8_more_types_interest: answers.p8,
     });
     setSubmitted(true);
   };
@@ -286,6 +297,7 @@ export function PhaseSurveyPost({ sessionId, onDone }: Props) {
             <p className="survey-section-head"><T s={HEAD_ACTION} /></p>
             <EmojiQ q={P6} value={answers.p6} onChange={v => set('p6', v)} low={P6_LOW} high={P6_HIGH} />
             <EmojiQ q={P7} value={answers.p7} onChange={v => set('p7', v)} low={P7_LOW} high={P7_HIGH} />
+            <EmojiQ q={P8} value={answers.p8} onChange={v => set('p8', v)} low={P8_LOW} high={P8_HIGH} />
 
             <div style={{ display: 'flex', gap: 10, marginTop: 4 }}>
               <button className="btn-secondary" onClick={() => setPage(0)}><T s={BACK_BTN} /></button>

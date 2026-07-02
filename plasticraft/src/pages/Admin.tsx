@@ -176,6 +176,7 @@ function SessionTable({ title, subtitle, sessions, indexOffset, onDelete }: {
                 <th>Post P5 AI Proud 😊</th>
                 <th>Post P6 Sort 😊</th>
                 <th>Post P7 Fun 😊</th>
+                <th>Post P8 More Types 😊</th>
               </tr>
             </thead>
             <tbody>
@@ -237,6 +238,7 @@ function SessionTable({ title, subtitle, sessions, indexOffset, onDelete }: {
                     <td>{stars(s.post?.p5_ai_achievement)}</td>
                     <td>{stars(s.post?.p6_sort_intention)}</td>
                     <td>{stars(s.post?.p7_fun)}</td>
+                    <td>{stars(s.post?.p8_more_types_interest)}</td>
                   </tr>
                 );
               })}

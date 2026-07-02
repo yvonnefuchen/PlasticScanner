@@ -46,3 +46,12 @@
 | p5_ai_achievement | Seeing your trash become something awesome — did you feel proud? (1–5) |
 | p6_sort_intention | From now on, will you look for the marks and sort your rubbish at home? (1–5) |
 | p7_fun | How fun was today's workshop? (1–5) |
+
+## Version 2 — 2026-07-02
+
+### Post-survey
+| Field | Question (EN) |
+|-------|--------------|
+| p8_more_types_interest | After this workshop, would you like to learn more about what other types of plastic can be used for? (1–5) |
+
+Added a new Action question (p8) asking whether the workshop made the child want to learn about other plastic types. No existing fields changed.

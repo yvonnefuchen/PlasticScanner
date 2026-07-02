@@ -17,6 +17,7 @@ export interface PostSurvey {
   // Action & Overall
   p6_sort_intention: number;   // 1–5: Will sort at home
   p7_fun: number;              // 1–5: How fun was today
+  p8_more_types_interest: number; // 1–5: Want to learn about other plastic types after this workshop
 }
 
 export interface SurveySession {
@@ -32,7 +33,7 @@ export interface SurveySession {
 }
 
 // Increment this whenever survey questions change. Document the change in db/SURVEY_CHANGELOG.md.
-export const SURVEY_VERSION = 1;
+export const SURVEY_VERSION = 2;
 
 const KEY = 'plasticraft_surveys';
 
@@ -149,7 +150,7 @@ export function exportCSV(sessions: SurveySession[]): string {
     // Post AI
     'post_p3_ai_interest', 'post_p4_ai_clarity', 'post_p5_ai_achievement',
     // Post Action
-    'post_p6_sort_intention', 'post_p7_fun',
+    'post_p6_sort_intention', 'post_p7_fun', 'post_p8_more_types_interest',
     // Meta
     'survey_version', 'location_country', 'location_city',
     // Photos — public URLs for DB sessions, [local-only] for unsynced base64
@@ -166,7 +167,7 @@ export function exportCSV(sessions: SurveySession[]): string {
     s.pre.q1_sort_habit, s.pre.q2_seen_marks, s.pre.q3_cap_behavior,
     s.post?.p1_cap_material, s.post?.p2_mix_result,
     s.post?.p3_ai_interest, s.post?.p4_ai_clarity, s.post?.p5_ai_achievement,
-    s.post?.p6_sort_intention, s.post?.p7_fun,
+    s.post?.p6_sort_intention, s.post?.p7_fun, s.post?.p8_more_types_interest,
     s.surveyVersion ?? 1, s.location?.country ?? '', s.location?.city ?? '',
     photoCell(s.scanPhotoUrl),
     photoCell(s.carPhotoUrl),

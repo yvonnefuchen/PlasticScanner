@@ -95,7 +95,7 @@ await check('savePost updates session', async () => {
     post: {
       p1_cap_material: 'B', p2_mix_result: 'B',
       p3_ai_interest: 4, p4_ai_clarity: 5, p5_ai_achievement: 3,
-      p6_sort_intention: 4, p7_fun: 5,
+      p6_sort_intention: 4, p7_fun: 5, p8_more_types_interest: 4,
     },
   });
 });
