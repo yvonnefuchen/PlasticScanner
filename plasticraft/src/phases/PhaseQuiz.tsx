@@ -10,8 +10,8 @@ interface Props {
   onCorrect: () => void;
 }
 
-const QUESTION: Tri = { zh: '這個塑膠該放進哪個桶？', ja: 'このプラスチックはどのゴミ箱に？', en: 'Which bin does this plastic go in?' };
-const TRY_AGAIN: Tri = { zh: '再試一次！', ja: 'もう一度試して！', en: 'Try again!' };
+const QUESTION: Tri = { zh: '這個塑膠該放進哪個桶？', ja: 'このプラスチックは どの ごみばこに いれる？', en: 'Which bin does this plastic go in?' };
+const TRY_AGAIN: Tri = { zh: '再試一次！', ja: 'もういちど ためして！', en: 'Try again!' };
 
 interface BinOption {
   category: BinCategory;
@@ -24,22 +24,22 @@ interface BinOption {
 const BIN_OPTIONS: BinOption[] = [
   {
     category: 'blue',
-    label:    { zh: '🔵 藍色桶', ja: '🔵 青いゴミ箱', en: '🔵 Blue Bin' },
+    label:    { zh: '🔵 藍色桶', ja: '🔵 あおい ごみばこ', en: '🔵 Blue Bin' },
     sublabel: { zh: 'PET 瓶子', ja: 'PETボトル', en: 'PET Bottles' },
     color: '#4FC3F7',
     lightColor: '#E1F5FE',
   },
   {
     category: 'green',
-    label:    { zh: '🟢 綠色桶', ja: '🟢 緑のゴミ箱', en: '🟢 Green Bin' },
-    sublabel: { zh: 'PP 瓶蓋 & 一般塑膠', ja: 'PPキャップ & 一般プラスチック', en: 'PP Caps & General Plastics' },
+    label:    { zh: '🟢 綠色桶', ja: '🟢 みどりの ごみばこ', en: '🟢 Green Bin' },
+    sublabel: { zh: 'PP 瓶蓋 & 一般塑膠', ja: 'PPキャップ & ふつうの プラスチック', en: 'PP Caps & General Plastics' },
     color: '#81C784',
     lightColor: '#E8F5E9',
   },
   {
     category: 'red',
-    label:    { zh: '🔴 紅色桶', ja: '🔴 赤いゴミ箱', en: '🔴 Red Bin' },
-    sublabel: { zh: '其他（特殊設施）', ja: 'その他（特殊施設）', en: 'Others (Special Facility)' },
+    label:    { zh: '🔴 紅色桶', ja: '🔴 あかい ごみばこ', en: '🔴 Red Bin' },
+    sublabel: { zh: '其他（特殊設施）', ja: 'そのほか（とくべつな しせつ）', en: 'Others (Special Facility)' },
     color: '#EF5350',
     lightColor: '#FFEBEE',
   },

@@ -17,10 +17,10 @@ export interface ScannerHandle {
   capture: () => string | null;
 }
 
-const CAPTURE_LABEL = { zh: '拍照', ja: '撮影する', en: 'Take Photo' };
+const CAPTURE_LABEL = { zh: '拍照', ja: 'しゃしんを とる', en: 'Take Photo' };
 const ALLOW_LABEL = {
   zh: '請允許相機存取',
-  ja: 'カメラのアクセスを許可してください',
+  ja: 'カメラを つかっても いいですか',
   en: 'Please allow camera access',
 };
 

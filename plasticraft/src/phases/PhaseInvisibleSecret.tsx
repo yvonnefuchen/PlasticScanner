@@ -11,47 +11,47 @@ interface Props {
 /* ── Scene text ─────────────────────────────────────────────────────────── */
 
 const SCENE_TITLES: Tri[] = [
-  { zh: 'AI 正在掃描你的塑膠…', ja: 'AIがプラスチックをスキャン中…', en: 'AI is scanning your plastic…' },
-  { zh: '嗨！我們來自介紹！', ja: 'こんにちは！自己紹介させて！', en: 'Hi! Allow us to introduce ourselves!' },
-  { zh: '進入工廠！溫度上升中…', ja: 'さあ工場へ！温度が上がってる…', en: 'Entering the factory! Temperature rising…' },
-  { zh: '糟糕！PP 融化了！', ja: 'やばい！PPが溶けた！', en: 'Uh oh! PP melted!' },
-  { zh: '分開就都能重生！', ja: '分ければ、どちらも生まれ変われる！', en: 'Separate them — both get a second life!' },
+  { zh: 'AI 正在掃描你的塑膠…', ja: 'AIが プラスチックを スキャンしてるよ…', en: 'AI is scanning your plastic…' },
+  { zh: '嗨！我們來自介紹！', ja: 'こんにちは！じこしょうかい させて！', en: 'Hi! Allow us to introduce ourselves!' },
+  { zh: '進入工廠！溫度上升中…', ja: 'さあ こうじょうへ！おんどが あがってるよ…', en: 'Entering the factory! Temperature rising…' },
+  { zh: '糟糕！PP 融化了！', ja: 'やばい！PPが とけた！', en: 'Uh oh! PP melted!' },
+  { zh: '分開就都能重生！', ja: 'わければ、どちらも うまれかわれる！', en: 'Separate them — both get a second life!' },
 ];
 
 const SCENE_BODIES: Tri[] = [
   {
     zh: '你的眼睛看到的是一整個瓶子。但 AI 能看到更多……',
-    ja: '目に見えるのは1本のボトル。でもAIにはもっと見えている……',
+    ja: 'めに みえるのは 1本の ボトル。でも AIには もっと みえているんだ……',
     en: 'Your eyes see one bottle. But AI can see more…',
   },
   {
     zh: '我是 PET！我在 260°C 才會融化。\n我是 PP！我在 160°C 就融化了。\n我們看起來一樣，但其實完全不同！',
-    ja: '僕はPET！260°Cで溶けるよ。\n僕はPP！160°Cで溶けちゃう。\n見た目は同じだけど、全然違うんだ！',
+    ja: 'ぼくは PET！260°Cで とけるよ。\nぼくは PP！160°Cで とけちゃう。\nみため は おなじだけど、ぜんぜん ちがうんだ！',
     en: "I'm PET! I melt at 260°C.\nI'm PP! I melt at 160°C.\nWe look the same — but we're totally different!",
   },
   {
     zh: '兩個放在一起進入工廠熔爐……溫度爬升到 160°C！',
-    ja: '一緒に工場の炉に入ると……温度が160°Cまで上がる！',
+    ja: 'いっしょに こうじょうの ろに いれると……おんどが 160°Cまで あがる！',
     en: 'Both go into the factory furnace together… temperature climbs to 160°C!',
   },
   {
     zh: 'PP 在 160°C 融化，污染了整批 PET！整批報廢。\n如果分開放，兩個都能被回收再生！',
-    ja: 'PPが160°Cで溶け、PETのバッチ全体を汚染！全部ダメになった。\n分けていれば、どちらもリサイクルできたのに！',
+    ja: 'PPが 160°Cで とけて、PETの バッチ ぜんぶを よごしちゃった！ぜんぶ ダメに なった。\nわけていれば、どちらも リサイクルできたのに！',
     en: 'PP melts at 160°C and contaminates the entire PET batch! Whole batch fails.\nIf separated, both could have been recycled!',
   },
   {
     zh: '這就是為什麼瓶身和瓶蓋必須分開！你的眼睛看不出來，但 AI 可以！',
-    ja: 'だからボトルとキャップを分ける必要があるんだ！目には見えないけど、AIにはわかる！',
+    ja: 'だから ボトルと キャップを わける ひつようが あるんだ！めには みえないけど、AIには わかる！',
     en: "This is WHY bottle and cap must be separated! Your eyes can't see it, but AI can!",
   },
 ];
 
-const BACK_BTN: Tri = { zh: '← 返回', ja: '← 戻る', en: '← Back' };
-const NEXT_BTN: Tri = { zh: '下一步 →', ja: '次へ →', en: 'Next →' };
-const START_BTN: Tri = { zh: '開始掃描！', ja: 'スキャン開始！', en: 'Start Scanning!' };
+const BACK_BTN: Tri = { zh: '← 返回', ja: '← もどる', en: '← Back' };
+const NEXT_BTN: Tri = { zh: '下一步 →', ja: 'つぎへ →', en: 'Next →' };
+const START_BTN: Tri = { zh: '開始掃描！', ja: 'スキャンを はじめる！', en: 'Start Scanning!' };
 const SCAN_HINT: Tri = {
   zh: '現在，讓我們看看你從家裡帶來的東西。你的眼睛可能無法分辨，但 AI 可以！',
-  ja: '今、あなたが家から持ってきたものを見てみよう。目では判断できないかもしれないけど、AIにはわかる！',
+  ja: 'いま、あなたが いえから もってきた ものを みてみよう。めでは わからないかもしれないけど、AIには わかる！',
   en: "Now, let's take a look at what you brought from home. Your eyes may not be able to tell, but AI can!",
 };
 

@@ -8,13 +8,13 @@ interface Props {
 
 const INVITE: { zh: string; ja: string; en: string } = {
   zh: '請餵我吃塑膠！讓我看看你帶了什麼寶貝？',
-  ja: 'プラスチックを食べさせて！何を持ってきたか見せて？',
+  ja: 'プラスチックを たべさせて！なにを もってきたか みせて？',
   en: 'Feed me plastic! Show me what treasure you brought!',
 };
 
 const START_BTN: { zh: string; ja: string; en: string } = {
   zh: '開始掃描',
-  ja: 'スキャン開始',
+  ja: 'スキャンを はじめる',
   en: 'Start Scanning',
 };
 

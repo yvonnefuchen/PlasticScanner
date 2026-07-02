@@ -137,7 +137,7 @@ export const PLASTICS: Record<PlasticId, PlasticType> = {
     binCategory: 'green',
     binWrongHints: {
       blue: { zh: '藍色桶是給 PET 飲料瓶的！PP 瓶蓋要放綠色桶！', ja: 'あおい ごみばこは PETボトルの ものだよ！PPキャップは みどりの ごみばこへ！', en: 'Blue bin is for PET bottles! PP caps go in the green bin!' },
-      red:  { zh: '紅色桶是特殊材質用的！PP 是一般塑膠，放綠色桶！', ja: あかい ごみばこは とくべつな ざいりょうの ものだよ！PPは ふつうの プラスチックだから みどりの ごみばこへ！', enn: 'Red is for special plastics! PP is general plastic — use the green bin!' },
+      red:  { zh: '紅色桶是特殊材質用的！PP 是一般塑膠，放綠色桶！', ja: 'あかい ごみばこは とくべつな ざいりょうの ものだよ！PPは ふつうの プラスチックだから みどりの ごみばこへ！', en: 'Red is for special plastics! PP is general plastic — use the green bin!' },
     },
   },
 

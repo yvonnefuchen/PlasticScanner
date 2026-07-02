@@ -20,24 +20,24 @@ interface Props {
   onOverride?: (id: PlasticId) => void;
 }
 
-const MELT_LABEL    = { zh: '融點', ja: '融点', en: 'Melting point' };
-const RETRY_LABEL   = { zh: '重新拍照試試', ja: 'もう一度撮ってみよう', en: 'Try capturing again' };
-const SCAN_FAIL_MSG = { zh: '掃描失敗了，請再試一次！', ja: 'スキャンに失敗しました。もう一度試してね！', en: 'Scan failed — please try again!' };
-const AI_REASONING  = { zh: 'AI 判斷依據', ja: 'AI の判断根拠', en: 'AI reasoning' };
-const RESHAPE_TITLE = { zh: '用它可以做成這些東西：', ja: 'これに生まれ変われるよ：', en: 'This can be reshaped into:' };
-const TAP_CONTINUE  = { zh: '繼續', ja: '続ける', en: 'Continue' };
-const CANT_FIND     = { zh: '找不到，繼續吧', ja: 'わからない、続ける', en: "Can't find it — continue" };
-const CONFIRMED_MSG = { zh: '太棒了！你找到了！現在看看它可以變成什麼！', ja: 'やったね！見つけた！さあ、何に生まれ変わるか見てみよう！', en: "Great find! Now let's see what it can become!" };
+const MELT_LABEL    = { zh: '融點', ja: 'とける おんど', en: 'Melting point' };
+const RETRY_LABEL   = { zh: '重新拍照試試', ja: 'もういちど とってみよう', en: 'Try capturing again' };
+const SCAN_FAIL_MSG = { zh: '掃描失敗了，請再試一次！', ja: 'スキャンが うまく いかなかったよ。もういちど ためしてね！', en: 'Scan failed — please try again!' };
+const AI_REASONING  = { zh: 'AI 判斷依據', ja: 'AI が そう おもった りゆう', en: 'AI reasoning' };
+const RESHAPE_TITLE = { zh: '用它可以做成這些東西：', ja: 'これから こんな ものに なれるよ：', en: 'This can be reshaped into:' };
+const TAP_CONTINUE  = { zh: '繼續', ja: 'つづける', en: 'Continue' };
+const CANT_FIND     = { zh: '找不到，繼續吧', ja: 'わからない、つづける', en: "Can't find it — continue" };
+const CONFIRMED_MSG = { zh: '太棒了！你找到了！現在看看它可以變成什麼！', ja: 'やったね！みつけた！さあ、なにに なるか みてみよう！', en: "Great find! Now let's see what it can become!" };
 
 /* Uncertainty prompt text — wraps the AI message with a child-friendly framing */
 const NOT_SURE_PREFIX = {
   zh: '🤔 我不太確定⋯⋯但我覺得這可能是',
-  ja: '🤔 自信はないけど⋯⋯たぶんこれは',
+  ja: '🤔 じしんは ないけど⋯⋯たぶん これは',
   en: "🤔 I'm not sure... but I think this might be",
 };
 const FIND_HINT = {
   zh: '！\n你能幫我嗎？翻到底部或側面，看看有沒有以下任何標籤印在上面：',
-  ja: '！\n手伝ってくれる？底か横を見て、こんなラベルがないか探してみて：',
+  ja: '！\nてつだって くれる？したや よこを みて、こんな ラベルが ないか さがしてみて：',
   en: '!\nCan you help me? Look at the bottom or side of the item — is there any of these labels printed on it?',
 };
 
@@ -71,7 +71,7 @@ export function PhaseIdentified({ plastic, scanData, scanError, capturedImage, s
   const reshapeRequests = !obj?.reshape_suggestions?.length ? [] :
     imgStyle === 'vehicle'
       ? [{ reshapeTarget: 'futuristic exploration craft', emoji: '🚀',
-           label: pick('未來探索器', '未来の探査機', 'Futuristic Craft') }]
+           label: pick('未來探索器', 'みらいの たんさき', 'Futuristic Craft') }]
       : obj.reshape_suggestions.slice(0, 3).map(s => ({
           reshapeTarget: s.image_search_query,
           emoji: s.emoji ?? '♻️',

@@ -114,7 +114,7 @@ async function generateImage(params: JobParams): Promise<string> {
   if (params.promptStyle === 'vehicle') {
     const titleMap: Record<string, { title: string; sub: string }> = {
       zh: { title: `${item}變身未來探索器大挑戰！`,             sub: `分析這個物品⋯發明你的新探索器！` },
-      ja: { title: `${item}で未来の探査機を作ろうチャレンジ！`,  sub: `この素材を分析して...新しい探索機を発明しよう！` },
+      ja: { title: `${item}で みらいの たんさきを つくろう チャレンジ！`,  sub: `このもの を しらべて…あたらしい たんさきを はつめいしよう！` },
       en: { title: `${item.toUpperCase()} TO FUTURISTIC CRAFT CHALLENGE!`, sub: `Analyze the object... and invent your new explorer!` },
     };
     const { title, sub } = titleMap[lang] ?? titleMap['en'];

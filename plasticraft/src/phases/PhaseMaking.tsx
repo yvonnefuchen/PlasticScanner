@@ -119,10 +119,10 @@ function CarDiagram() {
 
 const PHASE_TITLE: Tri = {
   zh: 'Future Craft 指令頁',
-  ja: 'Future Craft 指令ページ',
+  ja: 'Future Craft の やりかた',
   en: 'Future Craft Instructions',
 };
-const ROLES_TITLE: Tri = { zh: 'Step 1 — 角色分配', ja: 'Step 1 — 役割分担', en: 'Step 1 — Role Assignment' };
+const ROLES_TITLE: Tri = { zh: 'Step 1 — 角色分配', ja: 'Step 1 — やくわりを きめよう', en: 'Step 1 — Role Assignment' };
 
 const ROLES = [
   {
@@ -130,28 +130,28 @@ const ROLES = [
     badge: { label: '🔵 PET ①', color: '#4FC3F7', bg: 'rgba(79,195,247,0.15)' },
     material: { zh: '扭蛋殼 (PET)', ja: 'カプセル (PET)', en: 'Capsule (PET)' } as Tri,
     role: { zh: '輪匡', ja: 'ホイールリム', en: 'Wheel Rim' } as Tri,
-    desc: { zh: '你的「輪匡」它很強韌，不怕撞！', ja: '「ホイールリム」、強くて衝撃に強い！', en: 'Your "Wheel Rim" — strong and impact-resistant!' } as Tri,
+    desc: { zh: '你的「輪匡」它很強韌，不怕撞！', ja: '「ホイールリム」、とっても つよくて ぶつかっても へいき！', en: 'Your "Wheel Rim" — strong and impact-resistant!' } as Tri,
   },
   {
     emoji: '🔷',
     badge: { label: '🟢 PP ⑤', color: '#81C784', bg: 'rgba(129,199,132,0.15)' },
-    material: { zh: '六角連接件 (PP)', ja: '六角コネクター (PP)', en: 'Hex Connector (PP)' } as Tri,
+    material: { zh: '六角連接件 (PP)', ja: 'ろっかくコネクター (PP)', en: 'Hex Connector (PP)' } as Tri,
     role: { zh: '輪胎 / Universal Connector', ja: 'タイヤ / ユニバーサルコネクター', en: 'Wheel / Universal Connector' } as Tri,
-    desc: { zh: '你的「六角連接件」，讓輪子緊密結合！', ja: '「六角コネクター」、タイヤをしっかり固定する！', en: 'Your "Hex Connector" — makes the wheels click together tight!' } as Tri,
+    desc: { zh: '你的「六角連接件」，讓輪子緊密結合！', ja: '「ろっかくコネクター」、タイヤを しっかり くっつけるよ！', en: 'Your "Hex Connector" — makes the wheels click together tight!' } as Tri,
   },
   {
     emoji: '🍱',
     badge: { label: '🔴 PS ⑥', color: '#EF5350', bg: 'rgba(239,83,80,0.15)' },
     material: { zh: '肉托盤 (PS)', ja: 'ミートトレイ (PS)', en: 'Meat Tray (PS)' } as Tri,
     role: { zh: '車架', ja: 'シャーシ', en: 'Chassis' } as Tri,
-    desc: { zh: '你的「車架」。它很輕，可以讓車子跑很快！', ja: '「シャーシ」、軽いから車が速く走れるよ！', en: 'Your "Chassis" — lightweight, so your car goes fast!' } as Tri,
+    desc: { zh: '你的「車架」。它很輕，可以讓車子跑很快！', ja: '「シャーシ」、かるいから くるまが はやく はしれるよ！', en: 'Your "Chassis" — lightweight, so your car goes fast!' } as Tri,
   },
   {
     emoji: '🥤',
     badge: { label: '🟢 PP ⑤', color: '#81C784', bg: 'rgba(129,199,132,0.15)' },
     material: { zh: '吸管 (PP)', ja: 'ストロー (PP)', en: 'Straw (PP)' } as Tri,
     role: { zh: '動力轉軸', ja: 'ダイナミックアクスル', en: 'Dynamic Axle' } as Tri,
-    desc: { zh: '你的「動力轉軸」。細長堅韌，能支撐輪胎順暢地轉動！', ja: '「ダイナミックアクスル」、細くて強く、タイヤをスムーズに回転させる！', en: 'Your "Dynamic Axle" — slender and tough, keeps the wheels spinning smoothly!' } as Tri,
+    desc: { zh: '你的「動力轉軸」。細長堅韌，能支撐輪胎順暢地轉動！', ja: '「ダイナミックアクスル」、ほそくて つよくて、タイヤを くるくる まわすよ！', en: 'Your "Dynamic Axle" — slender and tough, keeps the wheels spinning smoothly!' } as Tri,
   },
 ];
 
@@ -164,75 +164,75 @@ interface StepData {
 
 const ASSEMBLY_STEPS: StepData[] = [
   {
-    title: { zh: 'Step 2 — 製作超級輪胎', ja: 'Step 2 — スーパータイヤを作ろう', en: 'Step 2 — Make the Super Wheels' },
+    title: { zh: 'Step 2 — 製作超級輪胎', ja: 'Step 2 — スーパータイヤを つくろう', en: 'Step 2 — Make the Super Wheels' },
     desc: {
       zh: '將 2 個六角連接件分別卡進 2 個 PET 扭蛋殼的一半，做成半輪子，確保緊密結合。',
-      ja: '2つの六角コネクターをそれぞれ2つのPETカプセルの半分にはめ込んで半輪を作ろう。しっかり固定してね。',
+      ja: '2つの ろっかくコネクターを それぞれ 2つの PETカプセルの はんぶんに はめこんで はんりんを つくろう。しっかり くっつけてね。',
       en: 'Press 2 hex connectors into 2 PET capsule halves to make two half-wheels. Make sure they click in tight.',
     },
     mascotSays: {
       zh: '記得用力壓下去，PP 材質很強韌，不用擔心它會壞掉！',
-      ja: 'しっかり押し込んでね、PPはとても強いから壊れる心配はないよ！',
+      ja: 'しっかり おしこんでね、PPは とても つよいから こわれる しんぱいは ないよ！',
       en: 'Press firmly — PP is tough, no need to worry about breaking it!',
     },
     Diagram: WheelsDiagram,
   },
   {
-    title: { zh: 'Step 3 — 安裝動力轉軸', ja: 'Step 3 — ダイナミックアクスルを取り付けよう', en: 'Step 3 — Install the Dynamic Axle' },
+    title: { zh: 'Step 3 — 安裝動力轉軸', ja: 'Step 3 — ダイナミックアクスルを つけよう', en: 'Step 3 — Install the Dynamic Axle' },
     desc: {
       zh: '拿出兩根吸管，各自穿過一組六角連接件的中心孔洞。現在你有了兩組可以自由轉動的「輪軸組」！',
-      ja: '2本のストローをそれぞれ六角コネクターの中心の穴に通してね。これで自由に回転できる「ホイールアクスルセット」が2つできたよ！',
+      ja: '2本の ストローを それぞれ ろっかくコネクターの まんなかの あなに とおしてね。これで じゆうに まわる「ホイールアクスルセット」が 2つ できたよ！',
       en: 'Thread a straw through the center hole of each hex connector set. You now have two freely-spinning wheel-axle sets!',
     },
     mascotSays: {
       zh: '吸管就是你的動力轉軸！讓輪子可以自由旋轉喔！',
-      ja: 'ストローがアクスルになるよ！タイヤが自由に回転できるね！',
+      ja: 'ストローが アクスルに なるよ！タイヤが くるくる まわるように なるね！',
       en: 'The straw is your Dynamic Axle! It lets the wheels spin freely!',
     },
     Diagram: AxleDiagram,
   },
   {
-    title: { zh: 'Step 4 — 合體！底盤固定', ja: 'Step 4 — 合体！シャーシを固定', en: 'Step 4 — Attach the Chassis!' },
+    title: { zh: 'Step 4 — 合體！底盤固定', ja: 'Step 4 — がったい！シャーシを とめよう', en: 'Step 4 — Attach the Chassis!' },
     desc: {
       zh: '將 PS 托盤反過來，使用膠帶或白膠，將兩組輪軸固定在托盤底部。',
-      ja: 'PSトレイをひっくり返して、テープか接着剤で2つのホイールアクスルセットをトレイの底に固定しよう。',
+      ja: 'PSトレイを ひっくりかえして、テープか のりで 2つの ホイールアクスルセットを トレイの そこに つけよう。',
       en: 'Flip the PS tray upside down. Use tape or glue to attach both wheel-axle sets to the bottom.',
     },
     mascotSays: {
       zh: '因為 PS 托盤很輕，建議把輪軸固定在靠近邊緣的地方，這樣跑起來才不會翻車喔！',
-      ja: 'PSトレイは軽いので、ホイールアクスルをトレイの端近くに固定すると転ばずに走れるよ！',
+      ja: 'PSトレイは かるいから、ホイールアクスルを トレイの はしの ほうに つけると たおれずに はしれるよ！',
       en: 'Since PS trays are light, attach the axles near the edges so the car stays stable while rolling!',
     },
     Diagram: ChassisDiagram,
   },
 ];
 
-const SUMMARY_TITLE: Tri = { zh: '你知道嗎？', ja: '知ってた？', en: 'Did You Know?' };
+const SUMMARY_TITLE: Tri = { zh: '你知道嗎？', ja: 'しってた？', en: 'Did You Know?' };
 const SUMMARY_TEXT: Tri = {
   zh: '你的戰車含有 3 種不同的塑膠！混在一起 = 垃圾。分類回收 = 有機會變成新的東西。',
-  ja: 'あなたのバトルカーには3種類の異なるプラスチックが入っています！混ぜたらゴミ。分別してリサイクル = 新しいものに生まれ変われるチャンス。',
+  ja: 'あなたの バトルカーには 3しゅるいの ちがう プラスチックが はいってるよ！まぜたら ゴミ。わけて リサイクルすると = あたらしい ものに なれる チャンス。',
   en: 'Your battle car contains 3 different plastics! Mixed together = trash. Separated for recycling = chance to become something new.',
 };
 const SUMMARY_MATERIALS = [
   { label: '🔵 PET ①', binType: 'blue' as const, role: { zh: '扭蛋殼 → 輪框', ja: 'カプセル → ホイール', en: 'Capsule → Wheel Rim' } as Tri, color: '#4FC3F7', bg: 'rgba(79,195,247,0.12)' },
   { label: '🟢 PP ⑤',  binType: 'green' as const, role: { zh: '瓶蓋 / 連接件 / 吸管', ja: 'キャップ / コネクター / ストロー', en: 'Cap / Connector / Straw' } as Tri, color: '#81C784', bg: 'rgba(129,199,132,0.12)' },
-  { label: '🔴 PS ⑥',  binType: 'red' as const, role: { zh: '托盤 → 車架（特殊回收）', ja: 'トレイ → シャーシ（特別回収）', en: 'Tray → Chassis (Special Recycling)' } as Tri, color: '#EF5350', bg: 'rgba(239,83,80,0.12)' },
+  { label: '🔴 PS ⑥',  binType: 'red' as const, role: { zh: '托盤 → 車架（特殊回收）', ja: 'トレイ → シャーシ（とくべつな かいしゅう）', en: 'Tray → Chassis (Special Recycling)' } as Tri, color: '#EF5350', bg: 'rgba(239,83,80,0.12)' },
 ];
 
-const NEXT_BTN: Tri = { zh: '下一步', ja: '次のステップ', en: 'Next Step' };
-const BACK_BTN: Tri = { zh: '上一步', ja: '前のステップ', en: 'Back' };
-const DONE_BTN: Tri = { zh: '完成！去回答問題', ja: '完成！質問に答えよう', en: 'Done! Answer Questions' };
-const COMPLETE_TITLE: Tri = { zh: '完成了嗎？🏆', ja: '完成しましたか？🏆', en: 'Did You Finish? 🏆' };
+const NEXT_BTN: Tri = { zh: '下一步', ja: 'つぎの ステップ', en: 'Next Step' };
+const BACK_BTN: Tri = { zh: '上一步', ja: 'まえの ステップ', en: 'Back' };
+const DONE_BTN: Tri = { zh: '完成！去回答問題', ja: 'できた！しつもんに こたえよう', en: 'Done! Answer Questions' };
+const COMPLETE_TITLE: Tri = { zh: '完成了嗎？🏆', ja: 'できたかな？🏆', en: 'Did You Finish? 🏆' };
 const PHOTO_PROMPT: Tri = {
   zh: '幫你的帥車拍個照吧！📸\n拍完照後，回答幾個小問題！',
-  ja: 'かっこいい車の写真を撮ろう！📸\n撮影後にいくつか質問に答えてね！',
+  ja: 'かっこいい くるまの しゃしんを とろう！📸\nしゃしんの あとに いくつか しつもんに こたえてね！',
   en: 'Take a photo of your cool car! 📸\nThen answer a few questions!',
 };
-const TAKE_PHOTO_BTN: Tri = { zh: '📸 拍照', ja: '📸 写真を撮る', en: '📸 Take Photo' };
-const RETAKE_BTN: Tri = { zh: '重拍', ja: '撮り直す', en: 'Retake' };
-const PHOTO_SAVED: Tri = { zh: '✅ 照片已儲存！', ja: '✅ 写真を保存しました！', en: '✅ Photo saved!' };
-const SKIP_PHOTO_BTN: Tri = { zh: '略過，繼續', ja: 'スキップして続ける', en: 'Skip & Continue' };
-const DESIGN_LABEL: Tri = { zh: '🎨 你的 AI 設計', ja: '🎨 あなたのAIデザイン', en: '🎨 Your AI Design' };
+const TAKE_PHOTO_BTN: Tri = { zh: '📸 拍照', ja: '📸 しゃしんを とる', en: '📸 Take Photo' };
+const RETAKE_BTN: Tri = { zh: '重拍', ja: 'とりなおす', en: 'Retake' };
+const PHOTO_SAVED: Tri = { zh: '✅ 照片已儲存！', ja: '✅ しゃしんを ほぞんしたよ！', en: '✅ Photo saved!' };
+const SKIP_PHOTO_BTN: Tri = { zh: '略過，繼續', ja: 'スキップして つづける', en: 'Skip & Continue' };
+const DESIGN_LABEL: Tri = { zh: '🎨 你的 AI 設計', ja: '🎨 あなたの AIデザイン', en: '🎨 Your AI Design' };
 
 /* ── Component ────────────────────────────────────────────────────────────── */
 

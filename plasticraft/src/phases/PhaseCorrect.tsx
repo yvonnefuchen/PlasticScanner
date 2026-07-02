@@ -10,8 +10,8 @@ interface Props {
   onNext: () => void;
 }
 
-const BRAVO = { zh: '太棒了！答對了！', ja: 'すごい！正解！', en: 'Amazing! Correct!' };
-const NEXT_BTN = { zh: '領取獎勵 →', ja: '報酬を受け取る →', en: 'Claim Reward →' };
+const BRAVO = { zh: '太棒了！答對了！', ja: 'すごい！せいかい！', en: 'Amazing! Correct!' };
+const NEXT_BTN = { zh: '領取獎勵 →', ja: 'ごほうびを もらう →', en: 'Claim Reward →' };
 
 function launchFireworks(color: string) {
   const end = Date.now() + 3000;

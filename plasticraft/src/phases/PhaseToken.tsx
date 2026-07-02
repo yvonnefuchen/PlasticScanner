@@ -6,19 +6,19 @@ interface Props {
   onNext: () => void;
 }
 
-const TITLE = { zh: '太棒了！送你一個 PP 超級英雄代幣（瓶蓋）！', ja: 'すごい！PP スーパーヒーロートークン（キャップ）をプレゼント！', en: 'Amazing! You earn a PP Super Hero Token (bottle cap)!' };
-const CLAW_LABEL = { zh: '把你的 PP 瓶蓋投入夾娃娃機…', ja: 'PP キャップをクレーンゲームに入れて…', en: 'Drop your PP cap into the claw machine…' };
-const TAP_CLAW = { zh: '點擊投入機台！', ja: 'タップして入れよう！', en: 'Tap to drop it in!' };
-const CAPSULE_TITLE = { zh: '🎉 你夾到扭蛋了！', ja: '🎉 カプセルをゲット！', en: '🎉 You got the capsule!' };
+const TITLE = { zh: '太棒了！送你一個 PP 超級英雄代幣（瓶蓋）！', ja: 'すごい！PP スーパーヒーロートークン（キャップ）を プレゼント！', en: 'Amazing! You earn a PP Super Hero Token (bottle cap)!' };
+const CLAW_LABEL = { zh: '把你的 PP 瓶蓋投入夾娃娃機…', ja: 'PP キャップを クレーンゲームに いれて…', en: 'Drop your PP cap into the claw machine…' };
+const TAP_CLAW = { zh: '點擊投入機台！', ja: 'タップして いれよう！', en: 'Tap to drop it in!' };
+const CAPSULE_TITLE = { zh: '🎉 你夾到扭蛋了！', ja: '🎉 カプセルを ゲット！', en: '🎉 You got the capsule!' };
 const CAPSULE_DESC = {
   zh: '扭蛋裡的六角形 connector，就是用 PP 做的——跟你的代幣一樣的材質！打開來準備組裝吧！',
-  ja: 'カプセルの中の六角形コネクターはPP製——トークンと同じ素材だよ！開けて組み立て準備しよう！',
+  ja: 'カプセルの なかの ろっかくけいコネクターは PPで できてるよ——トークンと おなじ そざいだよ！あけて くみたてる じゅんびを しよう！',
   en: 'The hexagonal connector inside is made from PP — the same material as your token! Open it up and get ready to build!',
 };
-const CONFIRM_BTN = { zh: '我拿到扭蛋了！開始製作！', ja: 'カプセルをゲットした！作ろう！', en: "Got my capsule! Let's build!" };
+const CONFIRM_BTN = { zh: '我拿到扭蛋了！開始製作！', ja: 'カプセルを ゲットした！つくろう！', en: "Got my capsule! Let's build!" };
 const PP_MAGIC = {
   zh: '你從瓶蓋拿到的代幣，還有你夾到的連接器——都是 PP！同一種材料，可以變成瓶蓋，也可以變成玩具零件。這就是回收的魔法！',
-  ja: 'キャップからもらったトークンも、掴んだコネクタも、どちらもPP！同じ素材が、ボトルキャップにも、おもちゃのパーツにもなれる。それがリサイクルの魔法！',
+  ja: 'キャップから もらった トークンも、つかんだ コネクタも、どちらも PP！おなじ そざいが、ボトルキャップにも、おもちゃの パーツにも なれる。それが リサイクルの まほう！',
   en: "The token you got from the PP cap, and the connector you grabbed — both made of PP! Same material, can become a bottle cap OR a toy part. That's the magic of recycling!",
 };
 

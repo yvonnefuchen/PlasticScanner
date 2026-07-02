@@ -41,7 +41,7 @@ const AI_PREVIEW: Tri = {
 /* Q1 */
 const Q1: Tri = {
   zh: '1. 你平常在家有分類垃圾嗎？',
-  ja: '1. おうちで ゴミを 種類（しゅるい）ごとに 分（わ）けてる？',
+  ja: '1. おうちで ゴミを しゅるいごとに わけてる？',
   en: '1. Do you sort your rubbish at home?',
 };
 const Q1_LOW: Tri = { zh: '從來沒有 😞', ja: 'ぜんぜん 😞', en: 'Never 😞' };
@@ -50,7 +50,7 @@ const Q1_HIGH: Tri = { zh: '每次都有！🤩', ja: 'いつも してるよ！
 /* Q2 */
 const Q2: Tri = {
   zh: '2. 你看過這些「神祕符號」嗎？',
-  ja: '2. このマーク、見（み）たことある？',
+  ja: '2. このマーク、みたこと ある？',
   en: '2. Have you seen these marks before?',
 };
 const Q2_A: Tri = { zh: '🅰️ 見過！有！', ja: '🅰️ ある！', en: '🅰️ Yes!' };

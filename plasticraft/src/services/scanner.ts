@@ -104,7 +104,7 @@ export const DEMO_SCAN_DATA: ScanData = {
   detected_objects: [
     {
       object_name_en: 'foam tray',
-      object_name_ja: '発泡トレイ',
+      object_name_ja: 'はっぽう トレイ',
       object_name_zh: '保麗龍托盤',
       material_full_en: 'Polystyrene (PS)',
       material_full_ja: 'ポリスチレン（PS）',
@@ -113,15 +113,15 @@ export const DEMO_SCAN_DATA: ScanData = {
       confidence: 'high',
       confidence_score: 0.88,
       melting_point_celsius: 240,
-      japan_bin_ja: 'プラスチック製容器包装',
+      japan_bin_ja: 'プラスチックの ようき・ほうそう',
       japan_bin_en: 'plastics packaging bin',
       label_to_look_for_en: "Look for 'PS' printed on the item",
-      label_to_look_for_ja: "商品に『PS』と書いてある部分を探してみよう",
+      label_to_look_for_ja: "しょうひんに『PS』って かいてある ところを さがしてみよう",
       reasoning_en: '[DEMO MODE — Gemini API not connected] White foam texture, lightweight, flat tray shape → Polystyrene (PS). No label visible.',
-      reasoning_ja: '[デモモード — Gemini API未接続] 白い発泡テクスチャ、軽量、フラットなトレイ形状 → ポリスチレン（PS）。ラベル見えず。',
+      reasoning_ja: '[でもモード — Gemini API せつぞくなし] しろい はっぽうの てざわり、かるい、たいらな トレイの かたち → ポリスチレン（PS）。ラベルは みえない。',
       reasoning_zh: '[示範模式 — Gemini API 未連接] 白色泡沫質地、輕盈、平板托盤形狀 → 聚苯乙烯（PS）。未見標籤。',
       character_message_en: "Hi! I am Polystyrene (PS)! I am super light — that is because I am mostly air bubbles! My melting point is 240°C. I am often used as a foam tray for meat or eggs. That is why I go in a different bin from PET bottles!",
-      character_message_ja: "こんにちは！ぼくはポリスチレン（PS）！とっても軽いでしょ？それはぼくがほとんど空気のあわでできているから！融点は240°Cだよ。お肉や卵のトレイによく使われてるんだ。だからPETボトルとは別のゴミ箱に入れるんだよ！",
+      character_message_ja: "こんにちは！ぼくは ポリスチレン（PS）！とっても かるいでしょ？それは ぼくが ほとんど くうきの あわで できているから！とける おんどは 240°Cだよ。おにくや たまごの トレイに よく つかわれてるんだ。だから PETボトルとは べつの ごみばこに いれるんだよ！",
       character_message_zh: "你好！我是聚苯乙烯（PS）！我超級輕盈，因為我幾乎都是氣泡！我的融點是240°C，常被用來做肉品或雞蛋的托盤。這就是為什麼我要和PET瓶分開丟！",
       reshape_suggestions: [
         {
@@ -134,7 +134,7 @@ export const DEMO_SCAN_DATA: ScanData = {
         {
           emoji: '🌱',
           item_en: 'seedling planting tray',
-          item_ja: '植木の苗トレイ',
+          item_ja: 'うえきの なえ トレイ',
           item_zh: '種植小苗的育苗盤',
           image_search_query: 'seedling tray gardening sprouts',
         },
@@ -147,7 +147,7 @@ export const DEMO_SCAN_DATA: ScanData = {
         },
       ],
       separation_lesson_en: 'Polystyrene (PS) softens around 100°C and fully melts at 240°C. Mixed with PET or PP in the recycling factory, it ruins the whole batch. Always check your local bin rules for PS!',
-      separation_lesson_ja: 'ポリスチレン（PS）は100°C頃から柔らかくなり、240°Cで完全に溶けます。工場でPETやPPと混ざると全部だめになってしまいます。PSは地域のルールを確認しよう！',
+      separation_lesson_ja: 'ポリスチレン（PS）は 100°Cくらいから やわらかく なって、240°Cで すっかり とけます。こうじょうで PETや PPと まざると ぜんぶ だめに なって しまいます。PSは じもとの ルールを たしかめよう！',
       separation_lesson_zh: '聚苯乙烯（PS）在100°C左右開始軟化，240°C完全融化。與PET或PP混入回收廠會污染整批。請查閱當地的PS回收規定！',
     },
   ],

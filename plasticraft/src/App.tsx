@@ -45,7 +45,7 @@ function AppInner() {
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const scannerRef = useRef<ScannerHandle>(null);
 
-  const ANALYZING_LABEL = { zh: '正在分析…', ja: '分析中…', en: 'Analyzing…' }[lang];
+  const ANALYZING_LABEL = { zh: '正在分析…', ja: 'しらべてるよ…', en: 'Analyzing…' }[lang];
 
   // Start 3-second countdown
   const startCountdown = useCallback(() => {
